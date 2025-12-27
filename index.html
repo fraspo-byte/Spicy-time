@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Spicy Time Premium</title>
+    
+    <!-- Meta tag per PWA -->
     <link rel="manifest" href="manifest.json">
-    <script src="https://cdn.jsdelivr.net/npm/buttplug@3.0.0/dist/web/buttplug.js"></script>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <style>
         :root {
             --cyan: #70f3ff; --purple: #8e44ad; --accent: #ff2d55;
@@ -14,53 +18,112 @@
             --soft: #70f3ff; --hot: #ff00ff; --hard: #ff2d55;
             --neon: 0 0 15px rgba(112, 243, 255, 0.5);
         }
+
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { background: #0d0b1a; color: #fff; margin: 0; padding: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; font-family: -apple-system, sans-serif; }
-        .bg-mesh { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: #0d0b1a; }
-        .blob { position: absolute; width: 450px; height: 450px; background: var(--purple); filter: blur(100px); border-radius: 50%; opacity: 0.2; animation: move 25s infinite alternate; }
-        .blob.two { bottom: -100px; right: -100px; background: var(--accent); }
+
+        body {
+            background: #0d0b1a; color: #fff; margin: 0; padding: 0; 
+            height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .bg-mesh { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; background: #0d0b1a; }
+        .blob { position: absolute; width: 450px; height: 450px; background: var(--purple); filter: blur(100px); border-radius: 50%; opacity: 0.2; animation: move 25s infinite alternate ease-in-out; }
+        .blob.one { top: -100px; left: -100px; }
+        .blob.two { bottom: -100px; right: -100px; background: var(--accent); animation-delay: -5s; }
         @keyframes move { 0% { transform: translate(0, 0); } 100% { transform: translate(120px, 200px); } }
+
         .top-nav { padding: 50px 20px 10px; display: grid; grid-template-columns: 80px 1fr 80px; align-items: center; height: 110px; z-index: 100; }
-        .back-btn { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); color: var(--cyan); padding: 10px; border-radius: 15px; font-size: 0.7rem; visibility: hidden; font-weight: 900; }
+        .back-btn { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); color: var(--cyan); padding: 10px; border-radius: 15px; font-size: 0.7rem; visibility: hidden; font-weight: 900; text-transform: uppercase; backdrop-filter: blur(10px); cursor: pointer; }
         .app-title { font-size: 1.1rem; letter-spacing: 5px; color: #fff; text-transform: uppercase; font-weight: 900; text-align: center; text-shadow: 0 0 10px var(--cyan); }
-        #cloud-dot { width: 10px; height: 10px; border-radius: 50%; background: #444; justify-self: center; transition: 0.5s; }
+        #cloud-dot { width: 10px; height: 10px; border-radius: 50%; background: #444; justify-self: center; box-shadow: 0 0 5px #000; transition: 0.5s; }
+
         .view { display: none; flex-direction: column; flex-grow: 1; padding: 0 20px; overflow: hidden; }
         .view.active { display: flex; animation: viewIn 0.3s ease-out; }
+        @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
-        .menu-card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 35px; padding: 25px 10px; text-align: center; backdrop-filter: blur(15px); }
+        .menu-card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 35px; padding: 25px 10px; text-align: center; backdrop-filter: blur(15px); cursor: pointer; transition: 0.2s; }
         .menu-card img { width: 60px; height: 60px; margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--cyan)); }
-        .menu-card span { display: block; font-size: 0.6rem; font-weight: 800; color: var(--cyan); }
-        #card-stack, #kama-stack { position: relative; flex-grow: 1; margin: 20px 0; display: flex; align-items: center; justify-content: center; }
-        .main-card { position: absolute; width: 88%; aspect-ratio: 3/4; max-height: 420px; background: #fff; color: #0d0b1a; border-radius: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 35px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
-        .btn-action { width: 100%; padding: 22px; border-radius: 25px; border: 2px solid var(--cyan); font-weight: 900; text-transform: uppercase; background: rgba(112,243,255,0.05); color: var(--cyan); cursor: pointer; }
+        .menu-card span { display: block; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--cyan); letter-spacing: 1px; }
+        .menu-card.disabled { opacity: 0.25; filter: grayscale(1); cursor: default; }
+
+        #card-stack { position: relative; flex-grow: 1; margin: 20px 0; display: flex; align-items: center; justify-content: center; width: 100%; perspective: 1000px; }
+        .main-card { 
+            position: absolute; 
+            width: 88%; 
+            aspect-ratio: 3 / 4; 
+            max-height: 420px;
+            background: #ffffff; 
+            color: #0d0b1a; 
+            border: none;
+            border-radius: 40px; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; padding: 25px; 
+            text-align: center; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            will-change: transform;
+            overflow: hidden;
+        }
+
+        /* STILE IMMAGINE CARTA */
+        .card-visual {
+            width: 100%;
+            height: 180px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            border-radius: 15px;
+        }
+
+        #timer-ui { display: none; margin-bottom: 20px; background: rgba(0,0,0,0.7); padding: 12px 30px; border-radius: 40px; align-items: center; gap: 15px; border: 1px solid var(--cyan); align-self: center; box-shadow: var(--neon); z-index: 1000; }
+        #timer-val { font-family: monospace; font-size: 2rem; color: var(--cyan); font-weight: bold; }
+
+        #timer-btn { 
+            background: var(--cyan); border: none; width: 45px; height: 45px; 
+            border-radius: 50%; color: black; font-weight: bold; font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; padding: 0; line-height: 0;
+        }
+
+        .btn-action { 
+            width: 100%; padding: 22px; border-radius: 25px; border: 2px solid var(--cyan); 
+            font-weight: 900; text-transform: uppercase; background: rgba(112, 243, 255, 0.05); 
+            color: var(--cyan); letter-spacing: 2px; cursor: pointer;
+            box-shadow: var(--neon); animation: neonPulse 2.5s infinite; margin-bottom: 40px;
+        }
+        @keyframes neonPulse { 0%, 100% { box-shadow: 0 0 10px var(--cyan); } 50% { box-shadow: 0 0 25px var(--cyan); } }
+        .btn-action:active { transform: scale(0.95); background: var(--cyan); color: #000; }
+
+        .scroll-area { overflow-y: auto; flex-grow: 1; padding-bottom: 80px; }
+        .input-group { background: var(--glass); padding: 25px; border-radius: 35px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); }
+        textarea, select, input[type=number], input[type=text] { width: 100%; background: #000; border: 1px solid #333; color: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; font-size: 1rem; }
         
-        /* STEALTH MODES */
-        .wp-container, .calc-container, .pad-container { display:none; flex-direction:column; height:100vh; position:absolute; top:0; left:0; width:100%; z-index:2000; }
-        .wp-container { background:#e5ddd5; }
-        .wp-header { background:#075e54; color:white; padding:45px 15px 10px; font-weight:bold; }
-        .wp-input-area { background:#f0f0f0; padding:10px; display:flex; gap:10px; }
-        .wp-input { background:white; border-radius:25px; padding:10px; flex-grow:1; border:none; color:black; }
-        .calc-container { background:black; padding:20px; }
-        .calc-display { height:150px; color:white; font-size:4rem; display:flex; align-items:flex-end; justify-content:flex-end; }
-        .calc-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; }
-        .calc-btn { aspect-ratio:1; border-radius:50%; border:none; font-size:1.5rem; font-weight:bold; background:#333; color:white; }
-        .pad-container { background:black; touch-action:none; }
+        .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding: 5px; }
+        .filter-chip { background: var(--glass); padding: 10px 18px; border-radius: 20px; font-size: 0.6rem; font-weight: 800; white-space: nowrap; border: 1px solid transparent; transition: 0.3s; }
+        .filter-chip.active { border-color: var(--cyan); color: var(--cyan); box-shadow: var(--neon); }
+
+        .challenge-item { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--cyan); font-size: 0.75rem; }
+
+        .lvl-tab { font-size: 0.8rem; font-weight: 900; opacity: 0.2; cursor: pointer; transition: 0.3s; }
+        .lvl-tab.active { opacity: 1; transform: scale(1.2); text-shadow: 0 0 10px currentColor; }
         
-        .lvl-tab { font-size: 0.8rem; font-weight: 900; opacity: 0.2; cursor: pointer; }
-        .lvl-tab.active { opacity: 1; transform: scale(1.2); }
         .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
-        .switch input { opacity: 0; width: 0; }
-        .slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #333; border-radius: 34px; cursor: pointer; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .4s; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #333; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background: var(--alc); }
         input:checked + .slider:before { transform: translateX(18px); }
-        .scroll-area { overflow-y: auto; flex-grow: 1; padding-bottom: 80px; }
+
+        @keyframes ui-shake { 0%, 100% { transform: translate(0,0); } 25% { transform: translate(-5px, 5px); } 75% { transform: translate(5px, -5px); } }
+        .ui-vibrate { animation: ui-shake 0.2s ease-in-out; }
     </style>
 </head>
 <body>
+
     <div class="bg-mesh"><div class="blob one"></div><div class="blob two"></div></div>
+
     <div class="top-nav">
-        <button id="btn-back" class="back-btn" onclick="goHome()">BACK</button>
+        <button id="btn-back" class="back-btn" onclick="openView('home')">BACK</button>
         <div class="app-title">Spicy Time</div>
         <div id="cloud-dot"></div>
     </div>
@@ -68,16 +131,16 @@
     <!-- HOME -->
     <div id="view-home" class="view active">
         <div class="menu-grid">
-            <div class="menu-card" onclick="openView('game')"><img src="img/dice.png"><span>Gioco</span></div>
-            <div class="menu-card" onclick="openView('kama')"><img src="img/xxx.png"><span>Kamasutra</span></div>
-            <div class="menu-card" onclick="openView('vibe')"><img src="img/vibe.png"><span>Vibratore</span></div>
-            <div class="menu-card" onclick="openView('settings')"><img src="img/bunny.png"><span>Personalizza</span></div>
+            <div class="menu-card" onclick="openView('game')"><img src="https://cdn-icons-png.flaticon.com/512/3418/3418886.png"><span>Gioco</span></div>
+            <div class="menu-card disabled"><img src="https://cdn-icons-png.flaticon.com/512/2530/2530533.png"><span>In Arrivo</span></div>
+            <div class="menu-card disabled"><img src="https://cdn-icons-png.flaticon.com/512/3132/3132714.png"><span>In Arrivo</span></div>
+            <div class="menu-card" onclick="openView('settings')"><img src="https://cdn-icons-png.flaticon.com/512/4471/4471020.png"><span>Personalizza</span></div>
         </div>
     </div>
 
     <!-- GAME -->
     <div id="view-game" class="view">
-        <div style="display:flex; flex-direction:column; align-items:center; gap:12px; margin-bottom:15px;">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:12px; margin-bottom:15px; z-index:1000;">
             <div style="display:flex; align-items:center; gap:10px; font-size:0.6rem; color:var(--alc); font-weight:bold;">
                 DRINK MODE <label class="switch"><input type="checkbox" id="alc-toggle" onchange="toggleAlcohol()"><span class="slider"></span></label>
             </div>
@@ -87,166 +150,234 @@
                 <span onclick="setLvl(3)" id="l3" class="lvl-tab" style="color:var(--hard)">HARD</span>
             </div>
         </div>
-        <div id="card-stack"><div class="main-card"><h1>🎲</h1><p style="font-weight:900;">MAZZO SOFT</p></div></div>
+        
+        <div id="card-stack">
+            <div class="main-card"><h1>🎲</h1><p style="font-weight:900; letter-spacing:1px;">MAZZO SOFT</p></div>
+        </div>
+
+        <div id="timer-ui">
+            <span id="timer-val">00:00</span>
+            <button onclick="handleTimer()" id="timer-btn">▶</button>
+        </div>
+        
         <button class="btn-action" onclick="generateChallenge()">Prossima Sfida</button>
-    </div>
-
-    <!-- KAMASUTRA -->
-    <div id="view-kama" class="view">
-        <div id="kama-stack"><div class="main-card"><h1>😈</h1><h3>KAMASUTRA</h3><p style="color:#666; font-size:0.8rem;">Scopri una posizione casuale.</p></div></div>
-        <button class="btn-action" onclick="generateKama()">Nuova Posizione</button>
-    </div>
-
-    <!-- VIBE -->
-    <div id="view-vibe" class="view">
-        <div style="padding: 20px; text-align:center;">
-            <button class="btn-action" id="vibe-conn-btn" onclick="connectVibe()" style="font-size:0.7rem; border-color:#333;">Sincronizza Hardware</button>
-            <p id="vibe-status-txt" style="font-size:0.6rem; color:#444;">CONFIGURA IP IN 'PERSONALIZZA'</p>
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; padding:20px;">
-            <div class="menu-card" style="padding:15px;" onclick="openStealth('wp')"><span>WHATSAPP</span></div>
-            <div class="menu-card" style="padding:15px;" onclick="openStealth('calc')"><span>CALC</span></div>
-            <div class="menu-card" style="padding:15px;" onclick="openStealth('pad')"><span>BLACK PAD</span></div>
-            <div class="menu-card" style="padding:15px;" onclick="goHome()"><span>ESCI</span></div>
-        </div>
-
-        <div id="mode-wp" class="wp-container">
-            <div class="wp-header" onclick="closeStealth()">← Amore ❤️</div>
-            <div style="flex-grow:1;"></div>
-            <div class="wp-input-area">
-                <input type="text" class="wp-input" placeholder="Messaggio" oninput="handleTyping(this.value)">
-                <div style="background:#075e54; color:white; width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center;" ontouchstart="startVoiceMode()" ontouchend="stopVoiceMode()">🎤</div>
-            </div>
-        </div>
-        <div id="mode-calc" class="calc-container">
-            <div class="calc-display" id="calc-res" onclick="closeStealth()">0</div>
-            <div class="calc-grid">
-                <button class="calc-btn" onclick="calcNum(7)">7</button><button class="calc-btn" onclick="calcNum(8)">8</button><button class="calc-btn" onclick="calcNum(9)">9</button><button class="calc-btn" style="background:#ff9f0a" onclick="stopVibe()">÷</button>
-                <button class="calc-btn" onclick="calcNum(4)">4</button><button class="calc-btn" onclick="calcNum(5)">5</button><button class="calc-btn" onclick="calcNum(6)">6</button><button class="calc-btn" style="background:#ff9f0a" onclick="stopVibe()">×</button>
-                <button class="calc-btn" onclick="calcNum(1)">1</button><button class="calc-btn" onclick="calcNum(2)">2</button><button class="calc-btn" onclick="calcNum(3)">3</button><button class="calc-btn" style="background:#ff9f0a">-</button>
-                <button class="calc-btn" style="grid-column: span 2; border-radius:30px;" onclick="calcNum(0)">0</button><button class="calc-btn" onclick="stopVibe()">=</button>
-            </div>
-        </div>
-        <div id="mode-pad" class="pad-container" ontouchstart="handlePad(event)" ontouchmove="handlePad(event)" ontouchend="stopVibe()" onclick="closeStealth()"></div>
     </div>
 
     <!-- SETTINGS -->
     <div id="view-settings" class="view">
         <div class="scroll-area">
             <div class="input-group">
-                <h3 style="color:var(--cyan); font-size:0.8rem;">INTIFACE SERVER IP</h3>
-                <input type="text" id="vibe-ip" placeholder="Es: 192.168.1.34" value="192.168.1.34">
-                <p style="font-size:0.5rem; color:#888;">Inserisci l'IP che vedi su Intiface Central.</p>
-            </div>
-            <div class="input-group">
-                <h3>NUOVA SFIDA</h3>
+                <h3 style="color:var(--cyan); margin:0 0 15px 0; font-size:0.9rem; letter-spacing:1px;">NUOVA SFIDA</h3>
                 <select id="ed-lvl"><option value="1">Soft</option><option value="2">Hot</option><option value="3">Hard</option></select>
                 <textarea id="ed-txt" placeholder="Usa @A e @B per i nomi..."></textarea>
-                <button class="btn-action" onclick="saveToCloud()">Invia al Cloud</button>
+                <input type="text" id="ed-img" placeholder="URL Immagine (opzionale)">
+                <input type="number" id="ed-time" placeholder="Timer (sec)">
+                <label style="color:var(--alc); font-size:0.7rem; display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+                    <input type="checkbox" id="ed-alc"> Sfida Alcolica 🍹
+                </label>
+                <button class="btn-action" style="background:var(--cyan); color:black;" id="btn-save" onclick="saveToCloud()">Invia al Cloud</button>
+            </div>
+
+            <div class="filter-bar">
+                <span class="filter-chip active" onclick="setFilter('all', this)">Tutte</span>
+                <span class="filter-chip" onclick="setFilter(1, this)">Soft</span>
+                <span class="filter-chip" onclick="setFilter(2, this)">Hot</span>
+                <span class="filter-chip" onclick="setFilter(3, this)">Hard</span>
+                <span class="filter-chip" onclick="setFilter('alc', this)">Drink</span>
             </div>
             <div id="master-list">Caricamento...</div>
         </div>
     </div>
 
     <script>
-        const CLOUD_URL = "https://script.google.com/macros/s/AKfycbz5tR2NVhlDzc6M-8AMBO5OE6r225X3miVhfF05YZYQB5oM-i9_bx9DlWNzRgcC85p3/exec";
+        // REGISTRAZIONE SERVICE WORKER (Necessario per installazione)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+
+        const CLOUD_URL = "LA_TUA_URL_GOOGLE_SCRIPT"; 
+        const aCtx = new (window.AudioContext || window.webkitAudioContext)();
         const players = ["Eva", "Francesco"];
-        let db = { 1: [], 2: [], 3: [] }, decks = { 1: [], 2: [], 3: [] };
-        let curLvl = 1, isAlc = false, bpClient, bpDevice, audioCtx, analyser, dataArray;
+        
+        let db = { 1: [], 2: [], 3: [] };
+        let decks = { 1: [], 2: [], 3: [] };
+        let curLvl = 1, isAlc = false, timer = null, timeLeft = 0, currentFilter = 'all';
 
-        // --- MOTORE VIBRATORE (CONNESSIONE ALL'IP SPECIFICATO) ---
-        async function connectVibe() {
-            const txt = document.getElementById('vibe-status-txt');
-            const ip = document.getElementById('vibe-ip').value;
-            try {
-                const b = window.Buttplug || window.buttplug;
-                await b.buttplugInit();
-                bpClient = new b.ButtplugClient("SpicyTime");
-
-                // Connessione all'IP di Intiface Central (porta 12345 di default)
-                const connector = new b.ButtplugBrowserWebsocketConnectorOptions(`ws://${ip}:12345/buttplug`);
-                
-                await bpClient.connect(connector);
-                txt.innerText = "COLLEGATO A INTIFACE";
-
-                bpClient.on("deviceadded", (d) => { 
-                    bpDevice = d; 
-                    txt.innerText = "VIBRATORE PRONTO: " + d.Name;
-                    txt.style.color = "var(--cyan)";
-                });
-                await bpClient.startScanning();
-            } catch (e) { 
-                alert("ERRORE: Non riesco a collegarmi a Intiface.\n1. Assicurati che l'IP sia corretto.\n2. Attiva 'Contenuti non sicuri' nelle impostazioni sito di Chrome."); 
-            }
-        }
-
-        async function vibrate(i) { if(bpDevice) await bpDevice.vibrate(Math.max(0, Math.min(1, i))); }
-        function stopVibe() { vibrate(0); }
-        function openStealth(m) { document.getElementById('mode-'+m).style.display = 'flex'; }
-        function closeStealth() { document.querySelectorAll('.wp-container, .calc-container, .pad-container').forEach(el=>el.style.display='none'); stopVibe(); }
-        function handleTyping(v) { vibrate(v.length * 0.05 + ((v.match(/[A-Z]/g)||[]).length * 0.2)); clearTimeout(window.vT); window.vT = setTimeout(stopVibe, 600); }
-        async function startVoiceMode() {
-            try {
-                if(!audioCtx) audioCtx = new AudioContext();
-                const s = await navigator.mediaDevices.getUserMedia({ audio: true });
-                const src = audioCtx.createMediaStreamSource(s);
-                analyser = audioCtx.createAnalyser(); src.connect(analyser);
-                dataArray = new Uint8Array(analyser.frequencyBinCount);
-                function loop() { if(!analyser) return; analyser.getByteFrequencyData(dataArray); let sum = 0; dataArray.forEach(v=>sum+=v); vibrate((sum/dataArray.length)/80); window.vLoop = requestAnimationFrame(loop); }
-                loop();
-            } catch(e) { alert("Attiva microfono!"); }
-        }
-        function stopVoiceMode() { cancelAnimationFrame(window.vLoop); analyser=null; stopVibe(); }
-        function calcNum(n) { document.getElementById('calc-res').innerText = n; vibrate(n/10); setTimeout(stopVibe, 400); }
-        function handlePad(e) { vibrate(1 - (e.touches[0].clientY / window.innerHeight)); }
-
-        // --- KAMASUTRA ---
-        const kPos = [
-            {n:"69", d:"Un classico per il piacere reciproco.", i:"♋"},
-            {n:"Doggy Style", d:"Passione pura e profondità.", i:"🐕"},
-            {n:"Missionario", d:"Intimità e contatto visivo.", i:"👩‍❤️‍👨"},
-            {n:"Cowgirl", d:"Lei prende il comando.", i:"🤠"},
-            {n:"Il Cucchiaio", d:"Sensualità e coccole.", i:"🥄"},
-            {n:"Gambe alle spalle", d:"Contatto profondo.", i:"🔥"}
-        ];
-        function generateKama() {
-            const p = kPos[Math.floor(Math.random()*kPos.length)];
-            document.getElementById('kama-stack').innerHTML = `<div class="main-card"><h1>${p.i}</h1><h3>${p.n}</h3><p style="color:#666; font-size:0.8rem;">${p.d}</p></div>`;
-        }
-
-        // --- ORIGINALI ---
         async function syncDB() {
+            const dot = document.getElementById('cloud-dot');
             try {
                 const res = await fetch(`${CLOUD_URL}?t=${Date.now()}`);
-                const data = await res.json();
+                const cloudData = await res.json();
                 db = { 1: [], 2: [], 3: [] };
-                data.forEach(item => { if(db[item.livello]) db[item.livello].push({ t: item.testo, alc: item.alcolica }); });
-                document.getElementById('cloud-dot').style.background = "#0f0";
-            } catch (e) { document.getElementById('cloud-dot').style.background = "#f00"; }
+                cloudData.forEach(item => {
+                    if(db[item.livello]) db[item.livello].push({ 
+                        t: item.testo, 
+                        s: parseInt(item.timer) || 0, 
+                        alc: item.alcolica,
+                        img: item.immagine || "" // Carica immagine
+                    });
+                });
+                dot.style.background = "#00ff00"; dot.style.boxShadow = "0 0 10px #00ff00";
+                if(document.getElementById('view-settings').classList.contains('active')) renderList();
+            } catch (e) { 
+                dot.style.background = "#ff0000"; dot.style.boxShadow = "0 0 10px #ff0000";
+            }
         }
+
+        async function saveToCloud() {
+            const txt = document.getElementById('ed-txt').value;
+            const imgUrl = document.getElementById('ed-img').value;
+            if(!txt) return;
+            const btn = document.getElementById('btn-save');
+            const originalText = btn.innerText;
+            btn.innerText = "Invio...";
+            btn.disabled = true;
+            const params = new URLSearchParams({
+                action: 'add', livello: document.getElementById('ed-lvl').value,
+                testo: txt, timer: document.getElementById('ed-time').value || 0,
+                alcolica: document.getElementById('ed-alc').checked,
+                immagine: imgUrl
+            });
+            try {
+                await fetch(`${CLOUD_URL}?${params.toString()}`, { mode: 'no-cors' });
+                setTimeout(async () => {
+                    btn.innerText = "Dato Inviato!";
+                    document.getElementById('ed-txt').value = "";
+                    document.getElementById('ed-img').value = "";
+                    await syncDB();
+                    setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 1500);
+                }, 1000);
+            } catch (e) { btn.innerText = "Errore!"; btn.disabled = false; }
+        }
+
+        async function deleteFromCloud(testo) {
+            if(!confirm("Vuoi eliminare questa sfida?")) return;
+            const params = new URLSearchParams({ action: 'delete', testo: testo });
+            try { await fetch(`${CLOUD_URL}?${params.toString()}`, { mode: 'no-cors' }); setTimeout(syncDB, 1200); } catch (e) { console.error(e); }
+        }
+
+        function playSound(f, d, gVal = 0.1) {
+            if (aCtx.state === 'suspended') aCtx.resume();
+            const o = aCtx.createOscillator(), g = aCtx.createGain();
+            o.type = 'sine'; o.frequency.setValueAtTime(f, aCtx.currentTime);
+            g.gain.setValueAtTime(gVal, aCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, aCtx.currentTime + d);
+            o.connect(g); g.connect(aCtx.destination);
+            o.start(); o.stop(aCtx.currentTime + d);
+        }
+
         function setLvl(l) { 
-            curLvl = l; document.querySelectorAll('.lvl-tab').forEach((t, i) => t.classList.toggle('active', (i+1 === l)));
-            document.getElementById('card-stack').innerHTML = `<div class="main-card"><h1>${l==1?'🎲':l==2?'🔥':'😈'}</h1><p style="font-weight:900;">MAZZO LIVELLO ${l}</p></div>`;
+            curLvl = l; 
+            document.querySelectorAll('.lvl-tab').forEach((t, i) => t.classList.toggle('active', (i+1 === l)));
+            const names = {1: 'SOFT', 2: 'HOT', 3: 'HARD'};
+            const icons = {1: '🎲', 2: '🔥', 3: '😈'};
+            const container = document.getElementById('card-stack');
+            container.innerHTML = `<div class="main-card"><h1>${icons[l]}</h1><p style="font-weight:900; letter-spacing:2px;">MAZZO ${names[l]}</p></div>`;
+            resetTimerLogic();
+            document.getElementById('timer-ui').style.display = 'none';
+            if(navigator.vibrate) navigator.vibrate(20);
         }
+
         function generateChallenge() {
+            playSound(150, 0.1); 
+            if(navigator.vibrate) navigator.vibrate(30);
+            resetTimerLogic();
             if (decks[curLvl].length === 0) {
-                let pool = [...db[curLvl]]; if (!isAlc) pool = pool.filter(c => !c.alc);
+                let pool = [...db[curLvl]];
+                if (!isAlc) pool = pool.filter(c => !c.alc);
                 decks[curLvl] = pool.sort(() => Math.random() - 0.5);
             }
-            if (decks[curLvl].length === 0) return;
+            if (decks[curLvl].length === 0) { alert("Mazzo vuoto!"); return; }
+            
             const item = decks[curLvl].pop();
             const pA = players[Math.floor(Math.random()*2)], pB = (pA === players[0] ? players[1] : players[0]);
+            
             let txt = item.t.replace(/@A/g, `<strong>${pA}</strong>`).replace(/@B/g, `<strong>${pB}</strong>`);
+            if(item.alc) txt = "🍹 " + txt;
+
             const container = document.getElementById('card-stack');
-            const newCard = document.createElement('div'); newCard.className = 'main-card';
-            newCard.innerHTML = `<div style="font-size: 1.3rem; font-weight:700;">${txt}</div>`;
+            const newCard = document.createElement('div');
+            newCard.className = 'main-card ui-vibrate';
+            const rot = (Math.random() - 0.5) * 4; 
+            const offX = (Math.random() - 0.5) * 10, offY = (Math.random() - 0.5) * 10;
+            newCard.style.transform = `translate(${offX}px, ${offY}px) rotate(${rot}deg) scale(0.95)`;
+            newCard.style.zIndex = container.children.length + 1;
+            
+            // AGGIUNTA IMMAGINE SE PRESENTE
+            let imgTag = item.img ? `<img src="${item.img}" class="card-visual" onerror="this.style.display='none'">` : "";
+            newCard.innerHTML = `${imgTag}<div style="font-size: 1.2rem; font-weight:700; line-height:1.4;">${txt}</div>`;
+            
             container.appendChild(newCard);
-            if(container.children.length > 5) container.removeChild(container.children[0]);
+            if(container.children.length > 12) container.removeChild(container.children[0]);
+            setTimeout(() => { newCard.style.transform = `translate(${offX}px, ${offY}px) rotate(${rot}deg) scale(1)`; }, 30);
+
+            if(item.s > 0) { timeLeft = item.s; document.getElementById('timer-ui').style.display = 'flex'; updateTUI(); } 
+            else { document.getElementById('timer-ui').style.display = 'none'; }
         }
-        function openView(id) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById('view-' + id).classList.add('active'); document.getElementById('btn-back').style.visibility = (id === 'home' ? 'hidden' : 'visible'); }
-        function goHome() { closeStealth(); openView('home'); }
+
+        function handleTimer() {
+            const btn = document.getElementById('timer-btn');
+            if(timer) { resetTimerLogic(); } else {
+                btn.innerHTML = '⏸';
+                timer = setInterval(() => {
+                    timeLeft--; updateTUI();
+                    if(timeLeft <= 3 && timeLeft > 0) playSound(800, 0.1, 0.05);
+                    if(timeLeft <= 10 && timeLeft > 0) navigator.vibrate(40);
+                    if(timeLeft <= 0) { 
+                        resetTimerLogic(); 
+                        playSound(440, 1.2); setTimeout(()=>playSound(660,1.2),150);
+                        document.getElementById('card-stack').lastElementChild.innerHTML = `<h2 style="color:var(--accent);">TEMPO SCADUTO! 🔥</h2>`;
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimerLogic() { 
+            clearInterval(timer); timer = null; 
+            const btn = document.getElementById('timer-btn');
+            if(btn) btn.innerHTML = '▶'; 
+            if(navigator.vibrate) navigator.vibrate(0); 
+        }
+
+        function updateTUI() { let m = Math.floor(timeLeft / 60), s = timeLeft % 60; document.getElementById('timer-val').innerText = `${m}:${s < 10 ? '0'+s : s}`; }
+
+        function openView(id) {
+            playSound(300, 0.05);
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById('view-' + id).classList.add('active');
+            document.getElementById('btn-back').style.visibility = (id === 'home' ? 'hidden' : 'visible');
+            if(id === 'settings') renderList();
+        }
+
         function toggleAlcohol() { isAlc = document.getElementById('alc-toggle').checked; decks = {1:[], 2:[], 3:[]}; }
-        syncDB(); setInterval(syncDB, 30000);
+
+        function setFilter(f, el) {
+            currentFilter = f;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            renderList();
+        }
+
+        function renderList() {
+            const container = document.getElementById('master-list');
+            container.innerHTML = "";
+            [1, 2, 3].forEach(lvl => {
+                if(currentFilter !== 'all' && currentFilter !== 'alc' && currentFilter != lvl) return;
+                db[lvl].forEach((c, i) => {
+                    if(currentFilter === 'alc' && !c.alc) return;
+                    const div = document.createElement('div');
+                    div.className = "challenge-item";
+                    div.style.borderLeftColor = lvl==1?'var(--soft)':lvl==2?'var(--hot)':'var(--hard)';
+                    div.innerHTML = `<div>${c.alc?'🍹 ':''}${c.t.substring(0,35)}...</div>
+                    <button onclick="deleteFromCloud('${c.t.replace(/'/g, "\\'")}')" style="background:var(--accent); color:white; border:none; border-radius:10px; padding:6px 12px; font-weight:bold;">X</button>`;
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        document.body.addEventListener('touchstart', () => { if (aCtx.state === 'suspended') aCtx.resume(); }, {once: true});
+        syncDB();
+        setInterval(syncDB, 30000); 
     </script>
 </body>
 </html>
