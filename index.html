@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Spicy Time Premium</title>
     
-    <!-- Meta tag per PWA -->
+    <!-- PWA Meta -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="img/dice.png">
 
     <style>
         :root {
@@ -66,8 +67,8 @@
             overflow: hidden;
         }
 
-        /* STILE IMMAGINE CARTA */
-        .card-visual {
+        /* STILE IMMAGINE NELLE CARTE */
+        .card-img-content {
             width: 100%;
             height: 180px;
             object-fit: contain;
@@ -131,10 +132,10 @@
     <!-- HOME -->
     <div id="view-home" class="view active">
         <div class="menu-grid">
-            <div class="menu-card" onclick="openView('game')"><img src="https://cdn-icons-png.flaticon.com/512/3418/3418886.png"><span>Gioco</span></div>
-            <div class="menu-card disabled"><img src="https://cdn-icons-png.flaticon.com/512/2530/2530533.png"><span>In Arrivo</span></div>
-            <div class="menu-card disabled"><img src="https://cdn-icons-png.flaticon.com/512/3132/3132714.png"><span>In Arrivo</span></div>
-            <div class="menu-card" onclick="openView('settings')"><img src="https://cdn-icons-png.flaticon.com/512/4471/4471020.png"><span>Personalizza</span></div>
+            <div class="menu-card" onclick="openView('game')"><img src="img/dice.png"><span>Gioco</span></div>
+            <div class="menu-card disabled"><img src="img/xxx.png"><span>In Arrivo</span></div>
+            <div class="menu-card disabled"><img src="img/vibe.png"><span>In Arrivo</span></div>
+            <div class="menu-card" onclick="openView('settings')"><img src="img/bunny.png"><span>Personalizza</span></div>
         </div>
     </div>
 
@@ -190,12 +191,12 @@
     </div>
 
     <script>
-        // REGISTRAZIONE SERVICE WORKER (Necessario per installazione)
+        // Registrazione Service Worker per PWA
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(() => {});
+            navigator.serviceWorker.register('sw.js').catch(err => console.log("SW non registrato", err));
         }
 
-        const CLOUD_URL = "LA_TUA_URL_GOOGLE_SCRIPT"; 
+        const CLOUD_URL = "https://script.google.com/macros/s/AKfycbz5tR2NVhlDzc6M-8AMBO5OE6r225X3miVhfF05YZYQB5oM-i9_bx9DlWNzRgcC85p3/exec";
         const aCtx = new (window.AudioContext || window.webkitAudioContext)();
         const players = ["Eva", "Francesco"];
         
@@ -210,12 +211,14 @@
                 const cloudData = await res.json();
                 db = { 1: [], 2: [], 3: [] };
                 cloudData.forEach(item => {
-                    if(db[item.livello]) db[item.livello].push({ 
-                        t: item.testo, 
-                        s: parseInt(item.timer) || 0, 
-                        alc: item.alcolica,
-                        img: item.immagine || "" // Carica immagine
-                    });
+                    if(db[item.livello]) {
+                        db[item.livello].push({ 
+                            t: item.testo, 
+                            s: parseInt(item.timer) || 0, 
+                            alc: item.alcolica,
+                            img: item.immagine || ""
+                        });
+                    }
                 });
                 dot.style.background = "#00ff00"; dot.style.boxShadow = "0 0 10px #00ff00";
                 if(document.getElementById('view-settings').classList.contains('active')) renderList();
@@ -226,17 +229,18 @@
 
         async function saveToCloud() {
             const txt = document.getElementById('ed-txt').value;
-            const imgUrl = document.getElementById('ed-img').value;
             if(!txt) return;
             const btn = document.getElementById('btn-save');
             const originalText = btn.innerText;
             btn.innerText = "Invio...";
             btn.disabled = true;
             const params = new URLSearchParams({
-                action: 'add', livello: document.getElementById('ed-lvl').value,
-                testo: txt, timer: document.getElementById('ed-time').value || 0,
+                action: 'add', 
+                livello: document.getElementById('ed-lvl').value,
+                testo: txt, 
+                timer: document.getElementById('ed-time').value || 0,
                 alcolica: document.getElementById('ed-alc').checked,
-                immagine: imgUrl
+                immagine: document.getElementById('ed-img').value || ""
             });
             try {
                 await fetch(`${CLOUD_URL}?${params.toString()}`, { mode: 'no-cors' });
@@ -303,9 +307,8 @@
             newCard.style.transform = `translate(${offX}px, ${offY}px) rotate(${rot}deg) scale(0.95)`;
             newCard.style.zIndex = container.children.length + 1;
             
-            // AGGIUNTA IMMAGINE SE PRESENTE
-            let imgTag = item.img ? `<img src="${item.img}" class="card-visual" onerror="this.style.display='none'">` : "";
-            newCard.innerHTML = `${imgTag}<div style="font-size: 1.2rem; font-weight:700; line-height:1.4;">${txt}</div>`;
+            let imgHtml = item.img ? `<img src="${item.img}" class="card-img-content" onerror="this.style.display='none'">` : "";
+            newCard.innerHTML = `${imgHtml}<div style="font-size: 1.25rem; font-weight:700; line-height:1.4;">${txt}</div>`;
             
             container.appendChild(newCard);
             if(container.children.length > 12) container.removeChild(container.children[0]);
