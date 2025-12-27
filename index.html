@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Spicy Time Premium</title>
     
+    <!-- LINEE PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -27,12 +28,14 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
+        /* BACKGROUND MESH ANIMATO */
         .bg-mesh { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; background: #0d0b1a; }
         .blob { position: absolute; width: 450px; height: 450px; background: var(--purple); filter: blur(100px); border-radius: 50%; opacity: 0.2; animation: move 25s infinite alternate ease-in-out; }
         .blob.one { top: -100px; left: -100px; }
         .blob.two { bottom: -100px; right: -100px; background: var(--accent); animation-delay: -5s; }
         @keyframes move { 0% { transform: translate(0, 0); } 100% { transform: translate(120px, 200px); } }
 
+        /* NAV */
         .top-nav { padding: 50px 20px 10px; display: grid; grid-template-columns: 80px 1fr 80px; align-items: center; height: 110px; z-index: 100; }
         .back-btn { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); color: var(--cyan); padding: 10px; border-radius: 15px; font-size: 0.7rem; visibility: hidden; font-weight: 900; text-transform: uppercase; backdrop-filter: blur(10px); cursor: pointer; }
         .app-title { font-size: 1.1rem; letter-spacing: 5px; color: #fff; text-transform: uppercase; font-weight: 900; text-align: center; text-shadow: 0 0 10px var(--cyan); }
@@ -42,12 +45,14 @@
         .view.active { display: flex; animation: viewIn 0.3s ease-out; }
         @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* MENU */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
         .menu-card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 35px; padding: 25px 10px; text-align: center; backdrop-filter: blur(15px); cursor: pointer; transition: 0.2s; }
         .menu-card img { width: 60px; height: 60px; margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--cyan)); }
         .menu-card span { display: block; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--cyan); letter-spacing: 1px; }
         .menu-card.disabled { opacity: 0.25; filter: grayscale(1); cursor: default; }
 
+        /* CARD STACK */
         #card-stack, #kama-stack { position: relative; flex-grow: 1; margin: 20px 0; display: flex; align-items: center; justify-content: center; width: 100%; perspective: 1000px; }
         
         .main-card { 
@@ -70,8 +75,9 @@
         }
 
         .card-txt-box { font-size: 1.3rem; font-weight: 700; line-height: 1.4; margin-bottom: 10px; }
-        .card-img-box { width: 100%; max-height: 280px; object-fit: contain; border-radius: 20px; margin-top: 10px; display: block; }
+        .card-img-box { width: 100%; max-height: 250px; object-fit: contain; border-radius: 20px; margin-top: 10px; display: block; }
 
+        /* TIMER & AZIONI */
         #timer-ui { display: none; margin-bottom: 20px; background: rgba(0,0,0,0.7); padding: 12px 30px; border-radius: 40px; align-items: center; gap: 15px; border: 1px solid var(--cyan); align-self: center; box-shadow: var(--neon); z-index: 1000; }
         #timer-val { font-family: monospace; font-size: 2rem; color: var(--cyan); font-weight: bold; }
         #timer-btn { background: var(--cyan); border: none; width: 45px; height: 45px; border-radius: 50%; color: black; font-weight: bold; font-size: 1.2rem; cursor: pointer; }
@@ -84,6 +90,7 @@
         }
         @keyframes neonPulse { 0%, 100% { box-shadow: 0 0 10px var(--cyan); } 50% { box-shadow: 0 0 25px var(--cyan); } }
 
+        /* LISTA E FILTRI */
         .scroll-area { overflow-y: auto; flex-grow: 1; padding-bottom: 80px; }
         .input-group { background: var(--glass); padding: 25px; border-radius: 35px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); }
         textarea, select, input[type=number], input[type=text] { width: 100%; background: #000; border: 1px solid #333; color: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; font-size: 1rem; }
@@ -122,7 +129,6 @@
     <div id="view-home" class="view active">
         <div class="menu-grid">
             <div class="menu-card" onclick="openView('game')"><img src="img/dice.png"><span>Gioco</span></div>
-            <!-- MODIFICATO: Attivata modalità Kamasutra -->
             <div class="menu-card" onclick="openView('kama')"><img src="img/xxx.png"><span>Kamasutra</span></div>
             <div class="menu-card disabled"><img src="img/vibe.png"><span>In Arrivo</span></div>
             <div class="menu-card" onclick="openView('settings')"><img src="img/bunny.png"><span>Personalizza</span></div>
@@ -154,14 +160,14 @@
         <button class="btn-action" onclick="generateChallenge()">Prossima Sfida</button>
     </div>
 
-    <!-- MODIFICATO: NUOVA VIEW KAMASUTRA -->
+    <!-- KAMASUTRA VIEW -->
     <div id="view-kama" class="view">
         <div style="text-align:center; margin-bottom:15px; z-index:1000;">
-            <span class="lvl-tab active" style="color:var(--hot)">POSIZIONI HOT</span>
+            <span class="lvl-tab active" style="color:var(--hard)">POSIZIONI SPECIALI</span>
         </div>
         
         <div id="kama-stack">
-            <div class="main-card"><h1>🔥</h1><p style="font-weight:900; letter-spacing:1px;">SCOPRI LE POSIZIONI</p></div>
+            <div class="main-card"><h1>🔥</h1><p style="font-weight:900; letter-spacing:1px;">SCOPRI IL PIACERE</p></div>
         </div>
 
         <button class="btn-action" onclick="generateKamasutra()">Prossima Posizione</button>
@@ -199,8 +205,11 @@
         const aCtx = new (window.AudioContext || window.webkitAudioContext)();
         const players = ["Eva", "Francesco"];
         
-        // MODIFICATO: Aggiunto elenco posizioni Kamasutra (aggiungi qui i nomi dei file che hai in /pos)
-        const kamaImages = ["pos/pos1.png"]; 
+        // DATI KAMASUTRA
+        const kamaData = [
+            { name: "L'Incrocio Magico", img: "pos/pos1.png", timer: 120 },
+            // Aggiungi qui altre posizioni se ne carichi altre nella cartella pos/
+        ];
         let kamaDeck = [];
 
         let db = { 1: [], 2: [], 3: [] };
@@ -245,12 +254,6 @@
             } catch (e) { btn.innerText = "Errore!"; btn.disabled = false; }
         }
 
-        async function deleteFromCloud(testo) {
-            if(!confirm("Eliminare?")) return;
-            const params = new URLSearchParams({ action: 'delete', testo: testo });
-            try { await fetch(`${CLOUD_URL}?${params.toString()}`, { mode: 'no-cors' }); setTimeout(syncDB, 1200); } catch (e) {}
-        }
-
         function playSound(f, d, gVal = 0.1) {
             try {
                 if (aCtx.state === 'suspended') aCtx.resume();
@@ -271,38 +274,46 @@
             resetTimerLogic(); document.getElementById('timer-ui').style.display = 'none';
         }
 
-        // MODIFICATO: Funzione per generare card Kamasutra
+        // LOGICA GENERAZIONE KAMASUTRA (VIEW DEDICATA)
         function generateKamasutra() {
             playSound(150, 0.1);
             if(navigator.vibrate) navigator.vibrate(30);
-
-            if (kamaDeck.length === 0) {
-                kamaDeck = [...kamaImages].sort(() => Math.random() - 0.5);
-            }
-
-            const imgPath = kamaDeck.pop();
+            if (kamaDeck.length === 0) kamaDeck = [...kamaData].sort(() => Math.random() - 0.5);
+            
+            const pos = kamaDeck.pop();
             const container = document.getElementById('kama-stack');
             const newCard = document.createElement('div');
             newCard.className = 'main-card ui-vibrate';
-            
-            const rot = (Math.random() - 0.5) * 4; 
-            newCard.style.transform = `rotate(${rot}deg)`;
-            
-            // Creiamo l'HTML con l'immagine
-            newCard.innerHTML = `
-                <div class="card-txt-box">Provate questa posizione!</div>
-                <img src="${imgPath}" class="card-img-box" alt="Kamasutra">
-            `;
-            
+            newCard.innerHTML = `<div class="card-txt-box">${pos.name}</div><img src="${pos.img}" class="card-img-box">`;
             container.appendChild(newCard);
             if(container.children.length > 5) container.removeChild(container.children[0]);
         }
 
+        // LOGICA GENERAZIONE SFIDA (CON PROBABILITÀ 1/40 PER KAMASUTRA IN HARD)
         function generateChallenge() {
             playSound(150, 0.1); 
             if(navigator.vibrate) navigator.vibrate(30);
             resetTimerLogic();
 
+            // 1 possibilità su 40 di pescare Kamasutra se siamo in HARD
+            if (curLvl === 3 && Math.random() < 0.025) {
+                const pos = kamaData[Math.floor(Math.random() * kamaData.length)];
+                const container = document.getElementById('card-stack');
+                const newCard = document.createElement('div');
+                newCard.className = 'main-card ui-vibrate';
+                newCard.style.border = "3px solid var(--accent)";
+                newCard.innerHTML = `
+                    <div style="color:var(--accent); font-weight:900; font-size:0.7rem; margin-bottom:10px;">SFIDA KAMASUTRA RARA!</div>
+                    <div class="card-txt-box">Mantenete la posizione:<br><span style="color:var(--purple)">${pos.name}</span></div>
+                    <img src="${pos.img}" class="card-img-box">
+                `;
+                container.appendChild(newCard);
+                if(container.children.length > 10) container.removeChild(container.children[0]);
+                if(pos.timer > 0) { timeLeft = pos.timer; document.getElementById('timer-ui').style.display = 'flex'; updateTUI(); }
+                return;
+            }
+
+            // Pesca normale dal database
             if (decks[curLvl].length === 0) {
                 let pool = [...db[curLvl]];
                 if (!isAlc) pool = pool.filter(c => !c.alc);
@@ -318,17 +329,13 @@
             const container = document.getElementById('card-stack');
             const newCard = document.createElement('div');
             newCard.className = 'main-card ui-vibrate';
-            const rot = (Math.random() - 0.5) * 4; 
-            newCard.style.transform = `rotate(${rot}deg)`;
-
+            
             let imgHtml = "";
             if (item.img && item.img.length > 3) {
-                let src = item.img.trim();
-                imgHtml = `<img src="${src}" class="card-img-box" style="display:block;" onerror="this.style.display='none'">`;
+                imgHtml = `<img src="${item.img}" class="card-img-box" onerror="this.style.display='none'">`;
             }
 
             newCard.innerHTML = `<div class="card-txt-box">${txt}</div>${imgHtml}`;
-            
             container.appendChild(newCard);
             if(container.children.length > 10) container.removeChild(container.children[0]);
 
@@ -380,9 +387,7 @@
                     if(currentFilter === 'alc' && !c.alc) return;
                     const div = document.createElement('div');
                     div.className = "challenge-item";
-                    div.style.borderLeftColor = lvl==1?'var(--soft)':lvl==2?'var(--hot)':'var(--hard)';
-                    div.innerHTML = `<div>${c.alc?'🍹 ':''}${c.t.substring(0,25)}...</div>
-                    <button onclick="deleteFromCloud('${c.t.replace(/'/g, "\\'")}')" style="background:var(--accent); color:white; border:none; border-radius:10px; padding:6px 12px;">X</button>`;
+                    div.innerHTML = `<div>${c.alc?'🍹 ':''}${c.t.substring(0,25)}...</div>`;
                     container.appendChild(div);
                 });
             });
@@ -392,15 +397,6 @@
         syncDB();
         setInterval(syncDB, 30000); 
 
-        if ('serviceWorker' in navigator) {
-          window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').then(reg => {
-              console.log('SW registrato con successo');
-            }).catch(err => {
-              console.log('Errore registrazione SW:', err);
-            });
-          });
-        }
     </script>
 </body>
 </html>
