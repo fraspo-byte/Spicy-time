@@ -4,400 +4,123 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Spicy Time Premium</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="img/dice.png">
-
     <style>
-        :root {
-            --cyan: #70f3ff; --purple: #8e44ad; --accent: #ff2d55;
-            --bg: #0d0b1a; --glass: rgba(255, 255, 255, 0.05);
-            --gold: #d4af37; --alc: #f59e0b;
-            --soft: #70f3ff; --hot: #ff00ff; --hard: #ff2d55;
-            --neon: 0 0 15px rgba(112, 243, 255, 0.5);
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-
-        body {
-            background: #0d0b1a; color: #fff; margin: 0; padding: 0; 
-            height: 100vh; overflow: hidden; display: flex; flex-direction: column;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        .bg-mesh { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; background: #0d0b1a; }
-        .blob { position: absolute; width: 450px; height: 450px; background: var(--purple); filter: blur(100px); border-radius: 50%; opacity: 0.2; animation: move 25s infinite alternate ease-in-out; }
-        .blob.one { top: -100px; left: -100px; }
-        .blob.two { bottom: -100px; right: -100px; background: var(--accent); animation-delay: -5s; }
-        @keyframes move { 0% { transform: translate(0, 0); } 100% { transform: translate(120px, 200px); } }
-
-        .top-nav { padding: 50px 20px 10px; display: grid; grid-template-columns: 80px 1fr 80px; align-items: center; height: 110px; z-index: 100; }
-        .back-btn { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); color: var(--cyan); padding: 10px; border-radius: 15px; font-size: 0.7rem; visibility: hidden; font-weight: 900; text-transform: uppercase; backdrop-filter: blur(10px); cursor: pointer; }
-        .app-title { font-size: 1.1rem; letter-spacing: 5px; color: #fff; text-transform: uppercase; font-weight: 900; text-align: center; text-shadow: 0 0 10px var(--cyan); }
-        #cloud-dot { width: 10px; height: 10px; border-radius: 50%; background: #444; justify-self: center; box-shadow: 0 0 5px #000; transition: 0.5s; }
-
-        .view { display: none; flex-direction: column; flex-grow: 1; padding: 0 20px; overflow: hidden; }
-        .view.active { display: flex; animation: viewIn 0.3s ease-out; }
-        @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
-        .menu-card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 35px; padding: 25px 10px; text-align: center; backdrop-filter: blur(15px); cursor: pointer; transition: 0.2s; }
-        .menu-card img { width: 60px; height: 60px; margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--cyan)); }
-        .menu-card span { display: block; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--cyan); letter-spacing: 1px; }
-        .menu-card.disabled { opacity: 0.25; filter: grayscale(1); cursor: default; }
-
-        #card-stack { position: relative; flex-grow: 1; margin: 10px 0; display: flex; align-items: center; justify-content: center; width: 100%; perspective: 1000px; }
+        :root { --cyan: #70f3ff; --purple: #8e44ad; --accent: #ff2d55; --glass: rgba(255, 255, 255, 0.05); }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: #0d0b1a; color: #fff; margin: 0; height: 100vh; overflow: hidden; font-family: sans-serif; display: flex; flex-direction: column; }
         
+        .top-nav { padding: 40px 20px 10px; display: grid; grid-template-columns: 80px 1fr 80px; align-items: center; }
+        .app-title { font-size: 1.1rem; letter-spacing: 3px; text-transform: uppercase; text-align: center; font-weight: 900; color: #fff; }
+        #cloud-dot { width: 10px; height: 10px; border-radius: 50%; background: #444; justify-self: center; }
+
+        .view { display: none; flex-direction: column; flex-grow: 1; padding: 0 20px; }
+        .view.active { display: flex; }
+
+        #card-stack { position: relative; flex-grow: 1; display: flex; align-items: center; justify-content: center; margin: 15px 0; }
         .main-card { 
-            position: absolute; 
-            width: 90%; 
-            aspect-ratio: 3 / 4.2; 
-            max-height: 480px;
-            background: #ffffff; 
-            color: #0d0b1a; 
-            border: none;
-            border-radius: 40px; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; padding: 20px; 
-            text-align: center; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            will-change: transform;
-            overflow: hidden;
+            position: absolute; width: 92%; height: 85%; max-height: 500px;
+            background: #fff; color: #111; border-radius: 40px; 
+            display: flex; flex-direction: column; padding: 25px; text-align: center; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
         }
 
-        /* STILE IMMAGINE - SOTTO IL TESTO */
-        .card-img-content {
-            width: 100%;
-            max-height: 240px;
-            object-fit: contain;
-            margin-top: 15px;
-            border-radius: 25px; /* Bordi stondati come richiesto */
-            background: #f8f8f8;
-            border: 1px solid #eee;
+        .card-txt { font-size: 1.25rem; font-weight: 800; line-height: 1.4; margin-bottom: 20px; }
+        
+        /* Box immagine: arrotondato e sotto il testo */
+        .card-img-box {
+            width: 100%; flex-grow: 1; background: #f0f0f0; 
+            border-radius: 30px; overflow: hidden; display: flex; align-items: center; justify-content: center;
         }
-
-        #timer-ui { display: none; margin-bottom: 20px; background: rgba(0,0,0,0.7); padding: 12px 30px; border-radius: 40px; align-items: center; gap: 15px; border: 1px solid var(--cyan); align-self: center; box-shadow: var(--neon); z-index: 1000; }
-        #timer-val { font-family: monospace; font-size: 2rem; color: var(--cyan); font-weight: bold; }
-
-        #timer-btn { 
-            background: var(--cyan); border: none; width: 45px; height: 45px; 
-            border-radius: 50%; color: black; font-weight: bold; font-size: 1.2rem;
-            display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; padding: 0; line-height: 0;
-        }
+        .card-img-content { width: 100%; height: 100%; object-fit: contain; }
 
         .btn-action { 
-            width: 100%; padding: 22px; border-radius: 25px; border: 2px solid var(--cyan); 
-            font-weight: 900; text-transform: uppercase; background: rgba(112, 243, 255, 0.05); 
-            color: var(--cyan); letter-spacing: 2px; cursor: pointer;
-            box-shadow: var(--neon); animation: neonPulse 2.5s infinite; margin-bottom: 40px;
+            width: 100%; padding: 20px; border-radius: 25px; border: 2px solid var(--cyan); 
+            font-weight: 900; background: rgba(112, 243, 255, 0.05); color: var(--cyan); 
+            margin-bottom: 35px; cursor: pointer;
         }
-        @keyframes neonPulse { 0%, 100% { box-shadow: 0 0 10px var(--cyan); } 50% { box-shadow: 0 0 25px var(--cyan); } }
-        .btn-action:active { transform: scale(0.95); background: var(--cyan); color: #000; }
 
-        .scroll-area { overflow-y: auto; flex-grow: 1; padding-bottom: 80px; }
-        .input-group { background: var(--glass); padding: 25px; border-radius: 35px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); }
-        textarea, select, input[type=number], input[type=text] { width: 100%; background: #000; border: 1px solid #333; color: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; font-size: 1rem; }
-        
-        .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding: 5px; }
-        .filter-chip { background: var(--glass); padding: 10px 18px; border-radius: 20px; font-size: 0.6rem; font-weight: 800; white-space: nowrap; border: 1px solid transparent; transition: 0.3s; }
-        .filter-chip.active { border-color: var(--cyan); color: var(--cyan); box-shadow: var(--neon); }
-
-        .challenge-item { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--cyan); font-size: 0.75rem; }
-
-        .lvl-tab { font-size: 0.8rem; font-weight: 900; opacity: 0.2; cursor: pointer; transition: 0.3s; }
-        .lvl-tab.active { opacity: 1; transform: scale(1.2); text-shadow: 0 0 10px currentColor; }
-        
-        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #333; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background: var(--alc); }
-        input:checked + .slider:before { transform: translateX(18px); }
-
-        @keyframes ui-shake { 0%, 100% { transform: translate(0,0); } 25% { transform: translate(-5px, 5px); } 75% { transform: translate(5px, -5px); } }
-        .ui-vibrate { animation: ui-shake 0.2s ease-in-out; }
+        #timer-ui { display: none; margin-bottom: 10px; background: rgba(0,0,0,0.8); padding: 10px 25px; border-radius: 40px; align-self: center; color: var(--cyan); font-family: monospace; font-size: 1.5rem; }
     </style>
 </head>
 <body>
 
-    <div class="bg-mesh"><div class="blob one"></div><div class="blob two"></div></div>
-
     <div class="top-nav">
-        <button id="btn-back" class="back-btn" onclick="openView('home')">BACK</button>
+        <div style="width:80px"></div>
         <div class="app-title">Spicy Time</div>
         <div id="cloud-dot"></div>
     </div>
 
-    <!-- HOME -->
     <div id="view-home" class="view active">
-        <div class="menu-grid">
-            <div class="menu-card" onclick="openView('game')"><img src="img/dice.png"><span>Gioco</span></div>
-            <div class="menu-card disabled"><img src="img/xxx.png"><span>In Arrivo</span></div>
-            <div class="menu-card disabled"><img src="img/vibe.png"><span>In Arrivo</span></div>
-            <div class="menu-card" onclick="openView('settings')"><img src="img/bunny.png"><span>Personalizza</span></div>
-        </div>
+        <button class="btn-action" onclick="openView('game')" style="margin-top:50px">INIZIA A GIOCARE</button>
     </div>
 
-    <!-- GAME -->
     <div id="view-game" class="view">
-        <div style="display:flex; flex-direction:column; align-items:center; gap:12px; margin-bottom:15px; z-index:1000;">
-            <div style="display:flex; align-items:center; gap:10px; font-size:0.6rem; color:var(--alc); font-weight:bold;">
-                DRINK MODE <label class="switch"><input type="checkbox" id="alc-toggle" onchange="toggleAlcohol()"><span class="slider"></span></label>
-            </div>
-            <div style="display:flex; gap:25px;">
-                <span onclick="setLvl(1)" id="l1" class="lvl-tab active" style="color:var(--soft)">SOFT</span>
-                <span onclick="setLvl(2)" id="l2" class="lvl-tab" style="color:var(--hot)">HOT</span>
-                <span onclick="setLvl(3)" id="l3" class="lvl-tab" style="color:var(--hard)">HARD</span>
-            </div>
+        <div style="display:flex; justify-content:center; gap:20px; margin-bottom:15px; font-weight:900;">
+            <span onclick="setLvl(1)" id="l1">SOFT</span>
+            <span onclick="setLvl(2)" id="l2" style="opacity:0.3">HOT</span>
+            <span onclick="setLvl(3)" id="l3" style="opacity:0.3">HARD</span>
         </div>
-        
-        <div id="card-stack">
-            <div class="main-card"><h1>🎲</h1><p style="font-weight:900; letter-spacing:1px;">MAZZO SOFT</p></div>
-        </div>
-
-        <div id="timer-ui">
-            <span id="timer-val">00:00</span>
-            <button onclick="handleTimer()" id="timer-btn">▶</button>
-        </div>
-        
-        <button class="btn-action" onclick="generateChallenge()">Prossima Sfida</button>
-    </div>
-
-    <!-- SETTINGS -->
-    <div id="view-settings" class="view">
-        <div class="scroll-area">
-            <div class="input-group">
-                <h3 style="color:var(--cyan); margin:0 0 15px 0; font-size:0.9rem; letter-spacing:1px;">NUOVA SFIDA</h3>
-                <select id="ed-lvl"><option value="1">Soft</option><option value="2">Hot</option><option value="3">Hard</option></select>
-                <textarea id="ed-txt" placeholder="Usa @A e @B per i nomi..."></textarea>
-                <input type="text" id="ed-img" placeholder="Es: pos/pos1.png">
-                <input type="number" id="ed-time" placeholder="Timer (sec)">
-                <label style="color:var(--alc); font-size:0.7rem; display:flex; align-items:center; gap:10px; margin-bottom:15px;">
-                    <input type="checkbox" id="ed-alc"> Sfida Alcolica 🍹
-                </label>
-                <button class="btn-action" style="background:var(--cyan); color:black;" id="btn-save" onclick="saveToCloud()">Invia al Cloud</button>
-            </div>
-
-            <div class="filter-bar">
-                <span class="filter-chip active" onclick="setFilter('all', this)">Tutte</span>
-                <span class="filter-chip" onclick="setFilter(1, this)">Soft</span>
-                <span class="filter-chip" onclick="setFilter(2, this)">Hot</span>
-                <span class="filter-chip" onclick="setFilter(3, this)">Hard</span>
-                <span class="filter-chip" onclick="setFilter('alc', this)">Drink</span>
-            </div>
-            <div id="master-list">Caricamento...</div>
-        </div>
+        <div id="card-stack"><div class="main-card"><h1>🎲</h1><p>PESCA</p></div></div>
+        <div id="timer-ui">00:00</div>
+        <button class="btn-action" onclick="generateChallenge()">PROSSIMA SFIDA</button>
     </div>
 
     <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(() => {});
-        }
-
-        const CLOUD_URL = "https://script.google.com/macros/s/AKfycbz5tR2NVhlDzc6M-8AMBO5OE6r225X3miVhfF05YZYQB5oM-i9_bx9DlWNzRgcC85p3/exec";
-        const aCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // METTI IL NUOVO URL QUI
+        const CLOUD_URL = "INCOLLA_QUI_IL_NUOVO_URL_DISTRIBUZIONE";
         const players = ["Eva", "Francesco"];
-        
-        let db = { 1: [], 2: [], 3: [] };
-        let decks = { 1: [], 2: [], 3: [] };
-        let curLvl = 1, isAlc = false, timer = null, timeLeft = 0, currentFilter = 'all';
+        let db = { 1: [], 2: [], 3: [] }, decks = { 1: [], 2: [], 3: [] }, curLvl = 1;
 
         async function syncDB() {
-            const dot = document.getElementById('cloud-dot');
             try {
                 const res = await fetch(`${CLOUD_URL}?t=${Date.now()}`);
-                const cloudData = await res.json();
+                const data = await res.json();
                 db = { 1: [], 2: [], 3: [] };
-                cloudData.forEach(item => {
-                    if(db[item.livello]) {
-                        db[item.livello].push({ 
-                            t: item.testo, 
-                            s: parseInt(item.timer) || 0, 
-                            alc: item.alcolica,
-                            img: item.immagine || item.img || "" 
-                        });
-                    }
+                data.forEach(item => {
+                    if(db[item.livello]) db[item.livello].push(item);
                 });
-                dot.style.background = "#00ff00"; dot.style.boxShadow = "0 0 10px #00ff00";
-                if(document.getElementById('view-settings').classList.contains('active')) renderList();
-            } catch (e) { 
-                dot.style.background = "#ff0000"; dot.style.boxShadow = "0 0 10px #ff0000";
-            }
+                document.getElementById('cloud-dot').style.background = "#00ff00";
+            } catch (e) { document.getElementById('cloud-dot').style.background = "#ff0000"; }
         }
 
         function generateChallenge() {
-            playSound(150, 0.1); 
-            if(navigator.vibrate) navigator.vibrate(30);
-            resetTimerLogic();
-            
-            if (decks[curLvl].length === 0) {
-                let pool = [...db[curLvl]];
-                if (!isAlc) pool = pool.filter(c => !c.alc);
-                decks[curLvl] = pool.sort(() => Math.random() - 0.5);
-            }
-            if (decks[curLvl].length === 0) { alert("Mazzo vuoto!"); return; }
-            
+            if (decks[curLvl].length === 0) decks[curLvl] = [...db[curLvl]].sort(() => Math.random() - 0.5);
+            if (decks[curLvl].length === 0) return alert("Mazzo vuoto!");
+
             const item = decks[curLvl].pop();
-            const pA = players[Math.floor(Math.random()*2)], pB = (pA === players[0] ? players[1] : players[0]);
-            
-            let txt = item.t.replace(/@A/g, `<strong>${pA}</strong>`).replace(/@B/g, `<strong>${pB}</strong>`);
-            if(item.alc) txt = "🍹 " + txt;
+            const p = [...players].sort(() => Math.random() - 0.5);
+            const txt = item.testo.replace(/@A/g, p[0]).replace(/@B/g, p[1]);
 
             const container = document.getElementById('card-stack');
-            const newCard = document.createElement('div');
-            newCard.className = 'main-card ui-vibrate';
-            const rot = (Math.random() - 0.5) * 4; 
-            newCard.style.transform = `rotate(${rot}deg) scale(0.95)`;
-            newCard.style.zIndex = container.children.length + 1;
-            
-            // COSTRUZIONE CONTENUTO: TESTO SOPRA, IMMAGINE SOTTO
-            let textPart = `<div style="font-size: 1.25rem; font-weight:700; line-height:1.4;">${txt}</div>`;
-            let imgPart = "";
-            
-            if (item.img && item.img.trim().length > 3) {
-                let src = item.img.trim();
-                // Se non è un link http, lo costruisce usando l'indirizzo base del sito
+            const card = document.createElement('div');
+            card.className = 'main-card';
+
+            let imgHtml = "";
+            if (item.immagine && item.immagine.length > 3) {
+                let src = item.immagine;
                 if (!src.startsWith('http')) {
-                    const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
-                    src = baseUrl + src;
+                    // Costruisce il link per GitHub Pages
+                    src = window.location.href.split('index.html')[0] + src;
                 }
-                imgPart = `<img src="${src}" class="card-img-content" onerror="this.style.display='none'">`;
+                imgHtml = `<div class="card-img-box"><img src="${src}" class="card-img-content"></div>`;
             }
-            
-            newCard.innerHTML = textPart + imgPart;
-            
-            container.appendChild(newCard);
-            if(container.children.length > 15) container.removeChild(container.children[0]);
-            setTimeout(() => { newCard.style.transform = `rotate(${rot}deg) scale(1)`; }, 30);
 
-            if(item.s > 0) { 
-                timeLeft = item.s; 
-                document.getElementById('timer-ui').style.display = 'flex'; 
-                updateTUI(); 
-            } else { 
-                document.getElementById('timer-ui').style.display = 'none'; 
-            }
-        }
-
-        async function saveToCloud() {
-            const txt = document.getElementById('ed-txt').value;
-            if(!txt) return;
-            const btn = document.getElementById('btn-save');
-            const originalText = btn.innerText;
-            btn.innerText = "Invio...";
-            btn.disabled = true;
-            const params = new URLSearchParams({
-                action: 'add', livello: document.getElementById('ed-lvl').value,
-                testo: txt, timer: document.getElementById('ed-time').value || 0,
-                alcolica: document.getElementById('ed-alc').checked,
-                immagine: document.getElementById('ed-img').value || ""
-            });
-            try {
-                await fetch(`${CLOUD_URL}?${params.toString()}`, { mode: 'no-cors' });
-                setTimeout(async () => {
-                    btn.innerText = "Dato Inviato!";
-                    document.getElementById('ed-txt').value = "";
-                    document.getElementById('ed-img').value = "";
-                    await syncDB();
-                    setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 1500);
-                }, 1000);
-            } catch (e) { btn.innerText = "Errore!"; btn.disabled = false; }
-        }
-
-        async function deleteFromCloud(testo) {
-            if(!confirm("Vuoi eliminare questa sfida?")) return;
-            const params = new URLSearchParams({ action: 'delete', testo: testo });
-            try { await fetch(`${CLOUD_URL}?${params.toString()}`, { mode: 'no-cors' }); setTimeout(syncDB, 1200); } catch (e) { console.error(e); }
-        }
-
-        function playSound(f, d, gVal = 0.1) {
-            if (aCtx.state === 'suspended') aCtx.resume();
-            const o = aCtx.createOscillator(), g = aCtx.createGain();
-            o.type = 'sine'; o.frequency.setValueAtTime(f, aCtx.currentTime);
-            g.gain.setValueAtTime(gVal, aCtx.currentTime);
-            g.gain.exponentialRampToValueAtTime(0.001, aCtx.currentTime + d);
-            o.connect(g); g.connect(aCtx.destination);
-            o.start(); o.stop(aCtx.currentTime + d);
+            card.innerHTML = `<div class="card-txt">${txt}</div>${imgHtml}`;
+            container.appendChild(card);
+            if(container.children.length > 5) container.removeChild(container.children[0]);
         }
 
         function setLvl(l) { 
             curLvl = l; 
-            document.querySelectorAll('.lvl-tab').forEach((t, i) => t.classList.toggle('active', (i+1 === l)));
-            const names = {1: 'SOFT', 2: 'HOT', 3: 'HARD'};
-            const icons = {1: '🎲', 2: '🔥', 3: '😈'};
-            const container = document.getElementById('card-stack');
-            container.innerHTML = `<div class="main-card"><h1>${icons[l]}</h1><p style="font-weight:900; letter-spacing:2px;">MAZZO ${names[l]}</p></div>`;
-            resetTimerLogic();
-            document.getElementById('timer-ui').style.display = 'none';
-            if(navigator.vibrate) navigator.vibrate(20);
+            [1,2,3].forEach(n => document.getElementById('l'+n).style.opacity = n==l ? '1' : '0.3');
         }
 
-        function handleTimer() {
-            const btn = document.getElementById('timer-btn');
-            if(timer) { resetTimerLogic(); } else {
-                btn.innerHTML = '⏸';
-                timer = setInterval(() => {
-                    timeLeft--; updateTUI();
-                    if(timeLeft <= 3 && timeLeft > 0) playSound(800, 0.1, 0.05);
-                    if(timeLeft <= 10 && timeLeft > 0) navigator.vibrate(40);
-                    if(timeLeft <= 0) { 
-                        resetTimerLogic(); 
-                        playSound(440, 1.2); setTimeout(()=>playSound(660,1.2),150);
-                        document.getElementById('card-stack').lastElementChild.innerHTML = `<h2 style="color:var(--accent);">TEMPO SCADUTO! 🔥</h2>`;
-                    }
-                }, 1000);
-            }
+        function openView(id) { 
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); 
+            document.getElementById('view-'+id).classList.add('active'); 
         }
 
-        function resetTimerLogic() { 
-            clearInterval(timer); timer = null; 
-            const btn = document.getElementById('timer-btn');
-            if(btn) btn.innerHTML = '▶'; 
-            if(navigator.vibrate) navigator.vibrate(0); 
-        }
-
-        function updateTUI() { let m = Math.floor(timeLeft / 60), s = timeLeft % 60; document.getElementById('timer-val').innerText = `${m}:${s < 10 ? '0'+s : s}`; }
-
-        function openView(id) {
-            playSound(300, 0.05);
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById('view-' + id).classList.add('active');
-            document.getElementById('btn-back').style.visibility = (id === 'home' ? 'hidden' : 'visible');
-            if(id === 'settings') renderList();
-        }
-
-        function toggleAlcohol() { isAlc = document.getElementById('alc-toggle').checked; decks = {1:[], 2:[], 3:[]}; }
-
-        function setFilter(f, el) {
-            currentFilter = f;
-            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            renderList();
-        }
-
-        function renderList() {
-            const container = document.getElementById('master-list');
-            container.innerHTML = "";
-            [1, 2, 3].forEach(lvl => {
-                if(currentFilter !== 'all' && currentFilter !== 'alc' && currentFilter != lvl) return;
-                db[lvl].forEach((c, i) => {
-                    if(currentFilter === 'alc' && !c.alc) return;
-                    const div = document.createElement('div');
-                    div.className = "challenge-item";
-                    div.style.borderLeftColor = lvl==1?'var(--soft)':lvl==2?'var(--hot)':'var(--hard)';
-                    div.innerHTML = `<div>${c.alc?'🍹 ':''}${c.t.substring(0,35)}...</div>
-                    <button onclick="deleteFromCloud('${c.t.replace(/'/g, "\\'")}')" style="background:var(--accent); color:white; border:none; border-radius:10px; padding:6px 12px; font-weight:bold;">X</button>`;
-                    container.appendChild(div);
-                });
-            });
-        }
-
-        document.body.addEventListener('touchstart', () => { if (aCtx.state === 'suspended') aCtx.resume(); }, {once: true});
         syncDB();
-        setInterval(syncDB, 30000); 
     </script>
 </body>
 </html>
