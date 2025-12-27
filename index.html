@@ -39,15 +39,14 @@
 
         .view { display: none; flex-direction: column; flex-grow: 1; padding: 0 20px; overflow: hidden; }
         .view.active { display: flex; animation: viewIn 0.3s ease-out; }
-        @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* CARDS MENU */
+        /* MENU CARDS */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
-        .menu-card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 35px; padding: 25px 10px; text-align: center; backdrop-filter: blur(15px); cursor: pointer; transition: 0.2s; }
+        .menu-card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 35px; padding: 25px 10px; text-align: center; backdrop-filter: blur(15px); cursor: pointer; }
         .menu-card img { width: 60px; height: 60px; margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--cyan)); }
         .menu-card span { display: block; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--cyan); letter-spacing: 1px; }
 
-        /* CARD STACK */
+        /* GAME & KAMA STACK */
         #card-stack, #kama-stack { position: relative; flex-grow: 1; margin: 20px 0; display: flex; align-items: center; justify-content: center; width: 100%; perspective: 1000px; }
         .main-card { 
             position: absolute; width: 88%; aspect-ratio: 3 / 4; max-height: 420px;
@@ -66,24 +65,22 @@
         }
         @keyframes neonPulse { 0%, 100% { box-shadow: 0 0 10px var(--cyan); } 50% { box-shadow: 0 0 25px var(--cyan); } }
 
-        /* STEALTH MODES VIBRATORE */
+        /* STEALTH MODES */
         .wp-container, .calc-container, .pad-container { display:none; flex-direction:column; height:100vh; position:absolute; top:0; left:0; width:100%; z-index:2000; }
         .wp-container { background:#e5ddd5; }
         .wp-header { background:#075e54; color:white; padding:45px 15px 10px; font-weight:bold; }
         .wp-input-area { background:#f0f0f0; padding:10px; display:flex; gap:10px; align-items:center; }
         .wp-input { background:white; border-radius:25px; padding:10px 15px; flex-grow:1; border:none; color:#000; }
-        
         .calc-container { background:#000; padding:20px; }
-        .calc-display { height:150px; color:white; font-size:4rem; display:flex; align-items:flex-end; justify-content:flex-end; font-family: monospace; }
+        .calc-display { height:150px; color:white; font-size:4rem; display:flex; align-items:flex-end; justify-content:flex-end; }
         .calc-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; }
         .calc-btn { aspect-ratio:1; border-radius:50%; border:none; font-size:1.5rem; font-weight:bold; background:#333; color:white; }
-
         .pad-container { background:#000; touch-action:none; }
 
-        /* ELEMENTI ORIGINALI PERSONALIZZA */
+        /* PERSONALIZZA ORIGINALE */
         .scroll-area { overflow-y: auto; flex-grow: 1; padding-bottom: 80px; }
         .input-group { background: var(--glass); padding: 25px; border-radius: 35px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); }
-        textarea, select, input[type=number] { width: 100%; background: #000; border: 1px solid #333; color: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; font-size: 1rem; }
+        textarea, select, input[type=number] { width: 100%; background: #000; border: 1px solid #333; color: white; padding: 15px; border-radius: 12px; font-size: 1rem; }
         .lvl-tab { font-size: 0.8rem; font-weight: 900; opacity: 0.2; cursor: pointer; transition: 0.3s; }
         .lvl-tab.active { opacity: 1; transform: scale(1.2); text-shadow: 0 0 10px currentColor; }
         .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
@@ -92,7 +89,6 @@
         .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background: var(--alc); }
         input:checked + .slider:before { transform: translateX(18px); }
-        .challenge-item { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--cyan); font-size: 0.75rem; }
     </style>
 </head>
 <body>
@@ -164,7 +160,7 @@
             <div class="calc-grid">
                 <button class="calc-btn" onclick="calcNum(7)">7</button><button class="calc-btn" onclick="calcNum(8)">8</button><button class="calc-btn" onclick="calcNum(9)">9</button><button class="calc-btn" style="background:#ff9f0a" onclick="stopVibe()">÷</button>
                 <button class="calc-btn" onclick="calcNum(4)">4</button><button class="calc-btn" onclick="calcNum(5)">5</button><button class="calc-btn" onclick="calcNum(6)">6</button><button class="calc-btn" style="background:#ff9f0a" onclick="stopVibe()">×</button>
-                <button class="calc-btn" onclick="calcNum(1)">1</button><button class="calc-btn" onclick="calcNum(2)">2</button><button class="calc-btn" onclick="calcNum(3)">3</button><button class="calc-btn" style="background:#ff9f0a" onclick="stopVibe()">-</button>
+                <button class="calc-btn" onclick="calcNum(1)">1</button><button class="calc-btn" onclick="calcNum(2)">2</button><button class="calc-btn" onclick="calcNum(3)">3</button><button class="calc-btn" style="background:#ff9f0a">-</button>
                 <button class="calc-btn" style="grid-column: span 2; border-radius:30px;" onclick="calcNum(0)">0</button><button class="calc-btn">.</button><button class="calc-btn" style="background:#ff9f0a" onclick="stopVibe()">=</button>
             </div>
         </div>
@@ -195,37 +191,41 @@
         let db = { 1: [], 2: [], 3: [] }, decks = { 1: [], 2: [], 3: [] };
         let curLvl = 1, isAlc = false, bpClient, bpDevice, audioCtx, analyser, dataArray;
 
-        // --- MOTORE VIBRATORE (FIX v3 DEFINITIVO) ---
+        // --- MOTORE VIBRATORE (AUTO-DISCOVERY v3) ---
         async function connectVibe() {
             const txt = document.getElementById('vibe-status-txt');
             try {
-                // Rilevamento libreria (Namespace variabile tra Buttplug/buttplug)
                 const b = window.Buttplug || window.buttplug;
-                if (!b) throw new Error("Libreria non caricata");
+                if (!b) throw new Error("Libreria non caricata.");
 
-                // Auto-rilevamento funzione INIT
-                const initFunc = b.buttplugInit || b.ButtplugInit || (b.default && b.default.buttplugInit);
-                if (initFunc) await initFunc();
+                // Inizializzazione Universale
+                const initKey = Object.keys(b).find(k => k.toLowerCase() === 'buttpluginit');
+                if (initKey) await b[initKey]();
 
                 bpClient = new b.ButtplugClient("SpicyTime");
 
-                // Trova il connettore Bluetooth corretto
-                const connectorClass = b.ButtplugEmbeddedConnectorOptions || 
-                                     b.ButtplugBrowserMobileWebBluetoothConnectorOptions;
-                
-                if (!connectorClass) throw new Error("Connettore non trovato");
-                
-                await bpClient.connect(new connectorClass());
+                // Cerca dinamicamente il connettore Bluetooth Web nelle proprietà della libreria
+                const connectorKey = Object.keys(b).find(k => 
+                    k.includes("WebBluetoothConnectorOptions") || 
+                    k.includes("EmbeddedConnectorOptions")
+                );
+
+                if (!connectorKey) throw new Error("Bluetooth non supportato.");
+                const connector = new b[connectorKey]();
+
+                await bpClient.connect(connector);
 
                 bpClient.on("deviceadded", (d) => { 
                     bpDevice = d; 
-                    txt.innerText = "SINCRO: " + d.Name.toUpperCase();
+                    txt.innerText = "CONNESSO: " + d.Name.toUpperCase();
                     txt.style.color = "var(--cyan)";
                     document.getElementById('vibe-conn-btn').innerText = "PRONTO";
                 });
 
                 await bpClient.startScanning();
-            } catch (e) { alert("ERRORE: " + e.message + "\nAssicurati di usare HTTPS e GPS attivo."); }
+            } catch (e) { 
+                alert("ERRORE: " + e.message + "\nAssicurati che il GPS sia ATTIVO e di essere su HTTPS."); 
+            }
         }
 
         async function vibrate(i) { if(bpDevice) await bpDevice.vibrate(Math.max(0, Math.min(1, i))); }
@@ -260,8 +260,8 @@
             {n:"Missionario", d:"Intimità e contatto visivo.", i:"👩‍❤️‍👨"},
             {n:"Cowgirl", d:"Lei prende il comando.", i:"🤠"},
             {n:"Il Cucchiaio", d:"Sensualità e coccole.", i:"🥄"},
-            {n:"La Farfalla", d:"Lei sul bordo del tavolo.", i:"🦋"},
-            {n:"Gambe alle spalle", d:"Contatto profondo.", i:"🔥"}
+            {n:"Gambe alle spalle", d:"Contatto molto profondo.", i:"🔥"},
+            {n:"La Farfalla", d:"Lei sul bordo del tavolo.", i:"🦋"}
         ];
         function generateKama() {
             const p = kPos[Math.floor(Math.random()*kPos.length)];
