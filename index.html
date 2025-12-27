@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Spicy Time Premium</title>
     <link rel="manifest" href="manifest.json">
-    <!-- Usiamo la versione bundle completa di Buttplug -->
     <script src="https://cdn.jsdelivr.net/npm/buttplug@3.0.0/dist/web/buttplug.js"></script>
     <style>
         :root {
@@ -34,6 +33,8 @@
         #card-stack, #kama-stack { position: relative; flex-grow: 1; margin: 20px 0; display: flex; align-items: center; justify-content: center; }
         .main-card { position: absolute; width: 88%; aspect-ratio: 3/4; max-height: 420px; background: #fff; color: #0d0b1a; border-radius: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 35px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
         .btn-action { width: 100%; padding: 22px; border-radius: 25px; border: 2px solid var(--cyan); font-weight: 900; text-transform: uppercase; background: rgba(112,243,255,0.05); color: var(--cyan); cursor: pointer; }
+        
+        /* STEALTH MODES */
         .wp-container, .calc-container, .pad-container { display:none; flex-direction:column; height:100vh; position:absolute; top:0; left:0; width:100%; z-index:2000; }
         .wp-container { background:#e5ddd5; }
         .wp-header { background:#075e54; color:white; padding:45px 15px 10px; font-weight:bold; }
@@ -44,6 +45,7 @@
         .calc-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; }
         .calc-btn { aspect-ratio:1; border-radius:50%; border:none; font-size:1.5rem; font-weight:bold; background:#333; color:white; }
         .pad-container { background:black; touch-action:none; }
+        
         .lvl-tab { font-size: 0.8rem; font-weight: 900; opacity: 0.2; cursor: pointer; }
         .lvl-tab.active { opacity: 1; transform: scale(1.2); }
         .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
@@ -99,7 +101,7 @@
     <div id="view-vibe" class="view">
         <div style="padding: 20px; text-align:center;">
             <button class="btn-action" id="vibe-conn-btn" onclick="connectVibe()" style="font-size:0.7rem; border-color:#333;">Sincronizza Hardware</button>
-            <p id="vibe-status-txt" style="font-size:0.6rem; color:#444;">PRIMA APRI INTIFACE CENTRAL</p>
+            <p id="vibe-status-txt" style="font-size:0.6rem; color:#444;">CONFIGURA IP IN 'PERSONALIZZA'</p>
         </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; padding:20px;">
             <div class="menu-card" style="padding:15px;" onclick="openStealth('wp')"><span>WHATSAPP</span></div>
@@ -108,7 +110,6 @@
             <div class="menu-card" style="padding:15px;" onclick="goHome()"><span>ESCI</span></div>
         </div>
 
-        <!-- WP -->
         <div id="mode-wp" class="wp-container">
             <div class="wp-header" onclick="closeStealth()">← Amore ❤️</div>
             <div style="flex-grow:1;"></div>
@@ -117,7 +118,6 @@
                 <div style="background:#075e54; color:white; width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center;" ontouchstart="startVoiceMode()" ontouchend="stopVoiceMode()">🎤</div>
             </div>
         </div>
-        <!-- CALC -->
         <div id="mode-calc" class="calc-container">
             <div class="calc-display" id="calc-res" onclick="closeStealth()">0</div>
             <div class="calc-grid">
@@ -134,6 +134,11 @@
     <div id="view-settings" class="view">
         <div class="scroll-area">
             <div class="input-group">
+                <h3 style="color:var(--cyan); font-size:0.8rem;">INTIFACE SERVER IP</h3>
+                <input type="text" id="vibe-ip" placeholder="Es: 192.168.1.34" value="192.168.1.34">
+                <p style="font-size:0.5rem; color:#888;">Inserisci l'IP che vedi su Intiface Central.</p>
+            </div>
+            <div class="input-group">
                 <h3>NUOVA SFIDA</h3>
                 <select id="ed-lvl"><option value="1">Soft</option><option value="2">Hot</option><option value="3">Hard</option></select>
                 <textarea id="ed-txt" placeholder="Usa @A e @B per i nomi..."></textarea>
@@ -149,26 +154,20 @@
         let db = { 1: [], 2: [], 3: [] }, decks = { 1: [], 2: [], 3: [] };
         let curLvl = 1, isAlc = false, bpClient, bpDevice, audioCtx, analyser, dataArray;
 
-        // --- MOTORE VIBRATORE (SUPPORTO INTIFACE + BLUETOOTH) ---
+        // --- MOTORE VIBRATORE (CONNESSIONE ALL'IP SPECIFICATO) ---
         async function connectVibe() {
             const txt = document.getElementById('vibe-status-txt');
+            const ip = document.getElementById('vibe-ip').value;
             try {
                 const b = window.Buttplug || window.buttplug;
                 await b.buttplugInit();
                 bpClient = new b.ButtplugClient("SpicyTime");
 
-                // PROVA 1: Connessione a Intiface Central (Localhost)
-                try {
-                    const connector = new b.ButtplugBrowserWebsocketConnectorOptions("ws://localhost:12345/buttplug");
-                    await bpClient.connect(connector);
-                    txt.innerText = "CONNESSO A INTIFACE";
-                } catch (err) {
-                    // PROVA 2: Fallback su Bluetooth diretto del browser
-                    console.log("Intiface non trovato, provo Bluetooth...");
-                    const connector = new b.ButtplugEmbeddedConnectorOptions();
-                    await bpClient.connect(connector);
-                    txt.innerText = "CERCO BLUETOOTH...";
-                }
+                // Connessione all'IP di Intiface Central (porta 12345 di default)
+                const connector = new b.ButtplugBrowserWebsocketConnectorOptions(`ws://${ip}:12345/buttplug`);
+                
+                await bpClient.connect(connector);
+                txt.innerText = "COLLEGATO A INTIFACE";
 
                 bpClient.on("deviceadded", (d) => { 
                     bpDevice = d; 
@@ -176,7 +175,9 @@
                     txt.style.color = "var(--cyan)";
                 });
                 await bpClient.startScanning();
-            } catch (e) { alert("Assicurati che Intiface Central sia attivo o usa Chrome con GPS acceso."); }
+            } catch (e) { 
+                alert("ERRORE: Non riesco a collegarmi a Intiface.\n1. Assicurati che l'IP sia corretto.\n2. Attiva 'Contenuti non sicuri' nelle impostazioni sito di Chrome."); 
+            }
         }
 
         async function vibrate(i) { if(bpDevice) await bpDevice.vibrate(Math.max(0, Math.min(1, i))); }
@@ -186,7 +187,7 @@
         function handleTyping(v) { vibrate(v.length * 0.05 + ((v.match(/[A-Z]/g)||[]).length * 0.2)); clearTimeout(window.vT); window.vT = setTimeout(stopVibe, 600); }
         async function startVoiceMode() {
             try {
-                if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if(!audioCtx) audioCtx = new AudioContext();
                 const s = await navigator.mediaDevices.getUserMedia({ audio: true });
                 const src = audioCtx.createMediaStreamSource(s);
                 analyser = audioCtx.createAnalyser(); src.connect(analyser);
@@ -213,7 +214,7 @@
             document.getElementById('kama-stack').innerHTML = `<div class="main-card"><h1>${p.i}</h1><h3>${p.n}</h3><p style="color:#666; font-size:0.8rem;">${p.d}</p></div>`;
         }
 
-        // --- GIOCO E CLOUD (ORIGINALI) ---
+        // --- ORIGINALI ---
         async function syncDB() {
             try {
                 const res = await fetch(`${CLOUD_URL}?t=${Date.now()}`);
