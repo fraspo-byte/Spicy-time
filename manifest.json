@@ -1,5 +1,5 @@
 {
-  "name": "Spicy Time Premium",
+  "name": "Spicy Time",
   "short_name": "SpicyTime",
   "start_url": "index.html",
   "display": "standalone",
@@ -7,7 +7,7 @@
   "theme_color": "#70f3ff",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/1041/1041883.png",
+      "src": "img/mask.png",
       "sizes": "512x512",
       "type": "image/png"
     }
