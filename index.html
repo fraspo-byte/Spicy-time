@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Spicy Time Premium</title>
     
-    <!-- PWA Meta -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -49,17 +48,18 @@
         .menu-card span { display: block; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--cyan); letter-spacing: 1px; }
         .menu-card.disabled { opacity: 0.25; filter: grayscale(1); cursor: default; }
 
-        #card-stack { position: relative; flex-grow: 1; margin: 20px 0; display: flex; align-items: center; justify-content: center; width: 100%; perspective: 1000px; }
+        #card-stack { position: relative; flex-grow: 1; margin: 10px 0; display: flex; align-items: center; justify-content: center; width: 100%; perspective: 1000px; }
+        
         .main-card { 
             position: absolute; 
-            width: 88%; 
-            aspect-ratio: 3 / 4; 
-            max-height: 420px;
+            width: 90%; 
+            aspect-ratio: 3 / 4.2; 
+            max-height: 480px;
             background: #ffffff; 
             color: #0d0b1a; 
             border: none;
             border-radius: 40px; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; padding: 25px; 
+            align-items: center; justify-content: center; padding: 20px; 
             text-align: center; 
             box-shadow: 0 10px 40px rgba(0,0,0,0.8);
             transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
@@ -67,13 +67,15 @@
             overflow: hidden;
         }
 
-        /* STILE IMMAGINE NELLE CARTE */
+        /* STILE IMMAGINE - SOTTO IL TESTO */
         .card-img-content {
             width: 100%;
-            height: 180px;
+            max-height: 240px;
             object-fit: contain;
-            margin-bottom: 15px;
-            border-radius: 15px;
+            margin-top: 15px;
+            border-radius: 25px; /* Bordi stondati come richiesto */
+            background: #f8f8f8;
+            border: 1px solid #eee;
         }
 
         #timer-ui { display: none; margin-bottom: 20px; background: rgba(0,0,0,0.7); padding: 12px 30px; border-radius: 40px; align-items: center; gap: 15px; border: 1px solid var(--cyan); align-self: center; box-shadow: var(--neon); z-index: 1000; }
@@ -171,7 +173,7 @@
                 <h3 style="color:var(--cyan); margin:0 0 15px 0; font-size:0.9rem; letter-spacing:1px;">NUOVA SFIDA</h3>
                 <select id="ed-lvl"><option value="1">Soft</option><option value="2">Hot</option><option value="3">Hard</option></select>
                 <textarea id="ed-txt" placeholder="Usa @A e @B per i nomi..."></textarea>
-                <input type="text" id="ed-img" placeholder="URL Immagine (opzionale)">
+                <input type="text" id="ed-img" placeholder="Es: pos/pos1.png">
                 <input type="number" id="ed-time" placeholder="Timer (sec)">
                 <label style="color:var(--alc); font-size:0.7rem; display:flex; align-items:center; gap:10px; margin-bottom:15px;">
                     <input type="checkbox" id="ed-alc"> Sfida Alcolica 🍹
@@ -191,9 +193,8 @@
     </div>
 
     <script>
-        // Registrazione Service Worker per PWA
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(err => console.log("SW non registrato", err));
+            navigator.serviceWorker.register('sw.js').catch(() => {});
         }
 
         const CLOUD_URL = "https://script.google.com/macros/s/AKfycbz5tR2NVhlDzc6M-8AMBO5OE6r225X3miVhfF05YZYQB5oM-i9_bx9DlWNzRgcC85p3/exec";
@@ -216,7 +217,7 @@
                             t: item.testo, 
                             s: parseInt(item.timer) || 0, 
                             alc: item.alcolica,
-                            img: item.immagine || ""
+                            img: item.immagine || item.img || "" 
                         });
                     }
                 });
@@ -224,6 +225,60 @@
                 if(document.getElementById('view-settings').classList.contains('active')) renderList();
             } catch (e) { 
                 dot.style.background = "#ff0000"; dot.style.boxShadow = "0 0 10px #ff0000";
+            }
+        }
+
+        function generateChallenge() {
+            playSound(150, 0.1); 
+            if(navigator.vibrate) navigator.vibrate(30);
+            resetTimerLogic();
+            
+            if (decks[curLvl].length === 0) {
+                let pool = [...db[curLvl]];
+                if (!isAlc) pool = pool.filter(c => !c.alc);
+                decks[curLvl] = pool.sort(() => Math.random() - 0.5);
+            }
+            if (decks[curLvl].length === 0) { alert("Mazzo vuoto!"); return; }
+            
+            const item = decks[curLvl].pop();
+            const pA = players[Math.floor(Math.random()*2)], pB = (pA === players[0] ? players[1] : players[0]);
+            
+            let txt = item.t.replace(/@A/g, `<strong>${pA}</strong>`).replace(/@B/g, `<strong>${pB}</strong>`);
+            if(item.alc) txt = "🍹 " + txt;
+
+            const container = document.getElementById('card-stack');
+            const newCard = document.createElement('div');
+            newCard.className = 'main-card ui-vibrate';
+            const rot = (Math.random() - 0.5) * 4; 
+            newCard.style.transform = `rotate(${rot}deg) scale(0.95)`;
+            newCard.style.zIndex = container.children.length + 1;
+            
+            // COSTRUZIONE CONTENUTO: TESTO SOPRA, IMMAGINE SOTTO
+            let textPart = `<div style="font-size: 1.25rem; font-weight:700; line-height:1.4;">${txt}</div>`;
+            let imgPart = "";
+            
+            if (item.img && item.img.trim().length > 3) {
+                let src = item.img.trim();
+                // Se non è un link http, lo costruisce usando l'indirizzo base del sito
+                if (!src.startsWith('http')) {
+                    const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
+                    src = baseUrl + src;
+                }
+                imgPart = `<img src="${src}" class="card-img-content" onerror="this.style.display='none'">`;
+            }
+            
+            newCard.innerHTML = textPart + imgPart;
+            
+            container.appendChild(newCard);
+            if(container.children.length > 15) container.removeChild(container.children[0]);
+            setTimeout(() => { newCard.style.transform = `rotate(${rot}deg) scale(1)`; }, 30);
+
+            if(item.s > 0) { 
+                timeLeft = item.s; 
+                document.getElementById('timer-ui').style.display = 'flex'; 
+                updateTUI(); 
+            } else { 
+                document.getElementById('timer-ui').style.display = 'none'; 
             }
         }
 
@@ -235,10 +290,8 @@
             btn.innerText = "Invio...";
             btn.disabled = true;
             const params = new URLSearchParams({
-                action: 'add', 
-                livello: document.getElementById('ed-lvl').value,
-                testo: txt, 
-                timer: document.getElementById('ed-time').value || 0,
+                action: 'add', livello: document.getElementById('ed-lvl').value,
+                testo: txt, timer: document.getElementById('ed-time').value || 0,
                 alcolica: document.getElementById('ed-alc').checked,
                 immagine: document.getElementById('ed-img').value || ""
             });
@@ -280,42 +333,6 @@
             resetTimerLogic();
             document.getElementById('timer-ui').style.display = 'none';
             if(navigator.vibrate) navigator.vibrate(20);
-        }
-
-        function generateChallenge() {
-            playSound(150, 0.1); 
-            if(navigator.vibrate) navigator.vibrate(30);
-            resetTimerLogic();
-            if (decks[curLvl].length === 0) {
-                let pool = [...db[curLvl]];
-                if (!isAlc) pool = pool.filter(c => !c.alc);
-                decks[curLvl] = pool.sort(() => Math.random() - 0.5);
-            }
-            if (decks[curLvl].length === 0) { alert("Mazzo vuoto!"); return; }
-            
-            const item = decks[curLvl].pop();
-            const pA = players[Math.floor(Math.random()*2)], pB = (pA === players[0] ? players[1] : players[0]);
-            
-            let txt = item.t.replace(/@A/g, `<strong>${pA}</strong>`).replace(/@B/g, `<strong>${pB}</strong>`);
-            if(item.alc) txt = "🍹 " + txt;
-
-            const container = document.getElementById('card-stack');
-            const newCard = document.createElement('div');
-            newCard.className = 'main-card ui-vibrate';
-            const rot = (Math.random() - 0.5) * 4; 
-            const offX = (Math.random() - 0.5) * 10, offY = (Math.random() - 0.5) * 10;
-            newCard.style.transform = `translate(${offX}px, ${offY}px) rotate(${rot}deg) scale(0.95)`;
-            newCard.style.zIndex = container.children.length + 1;
-            
-            let imgHtml = item.img ? `<img src="${item.img}" class="card-img-content" onerror="this.style.display='none'">` : "";
-            newCard.innerHTML = `${imgHtml}<div style="font-size: 1.25rem; font-weight:700; line-height:1.4;">${txt}</div>`;
-            
-            container.appendChild(newCard);
-            if(container.children.length > 12) container.removeChild(container.children[0]);
-            setTimeout(() => { newCard.style.transform = `translate(${offX}px, ${offY}px) rotate(${rot}deg) scale(1)`; }, 30);
-
-            if(item.s > 0) { timeLeft = item.s; document.getElementById('timer-ui').style.display = 'flex'; updateTUI(); } 
-            else { document.getElementById('timer-ui').style.display = 'none'; }
         }
 
         function handleTimer() {
