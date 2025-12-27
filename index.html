@@ -21,12 +21,14 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
+        /* BACKGROUND MESH ANIMATO */
         .bg-mesh { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; background: #0d0b1a; }
         .blob { position: absolute; width: 450px; height: 450px; background: var(--purple); filter: blur(100px); border-radius: 50%; opacity: 0.2; animation: move 25s infinite alternate ease-in-out; }
         .blob.one { top: -100px; left: -100px; }
         .blob.two { bottom: -100px; right: -100px; background: var(--accent); animation-delay: -5s; }
         @keyframes move { 0% { transform: translate(0, 0); } 100% { transform: translate(120px, 200px); } }
 
+        /* NAV */
         .top-nav { padding: 50px 20px 10px; display: grid; grid-template-columns: 80px 1fr 80px; align-items: center; height: 110px; z-index: 100; }
         .back-btn { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); color: var(--cyan); padding: 10px; border-radius: 15px; font-size: 0.7rem; visibility: hidden; font-weight: 900; text-transform: uppercase; backdrop-filter: blur(10px); cursor: pointer; }
         .app-title { font-size: 1.1rem; letter-spacing: 5px; color: #fff; text-transform: uppercase; font-weight: 900; text-align: center; text-shadow: 0 0 10px var(--cyan); }
@@ -36,48 +38,57 @@
         .view.active { display: flex; animation: viewIn 0.3s ease-out; }
         @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* MENU */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
         .menu-card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 35px; padding: 25px 10px; text-align: center; backdrop-filter: blur(15px); cursor: pointer; transition: 0.2s; }
         .menu-card img { width: 60px; height: 60px; margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--cyan)); }
         .menu-card span { display: block; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--cyan); letter-spacing: 1px; }
         .menu-card.disabled { opacity: 0.25; filter: grayscale(1); cursor: default; }
 
-        #card-stack { position: relative; flex-grow: 1; margin: 10px 0; display: flex; align-items: center; justify-content: center; width: 100%; perspective: 1000px; }
+        /* CARD STACK REVISIONATO */
+        #card-stack { position: relative; flex-grow: 1; margin: 20px 0; display: flex; align-items: center; justify-content: center; width: 100%; perspective: 1000px; }
         
         .main-card { 
             position: absolute; 
-            width: 90%; 
-            aspect-ratio: 3 / 4.5; 
-            max-height: 480px;
+            width: 88%; 
+            height: 100%; /* Ripristinato per stabilità */
+            max-height: 500px;
             background: #ffffff; 
             color: #0d0b1a; 
             border-radius: 40px; 
-            display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; 
-            padding: 25px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 30px; 
             text-align: center; 
             box-shadow: 0 10px 40px rgba(0,0,0,0.8);
             transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
             overflow: hidden;
         }
 
-        /* Testo sfida */
-        .card-text { font-size: 1.2rem; font-weight: 700; line-height: 1.4; flex-grow: 1; display: flex; align-items: center; justify-content: center; }
+        /* Testo Sfida */
+        .card-txt-box {
+            font-size: 1.3rem;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
 
-        /* Stile Immagine Dinamica */
-        .card-img-content {
+        /* Immagine Sfida */
+        .card-img-box {
             width: 100%;
-            max-height: 55%;
+            max-height: 200px; /* Limita l'altezza per non rompere il layout */
             object-fit: contain;
             border-radius: 20px;
             margin-top: 10px;
-            background: #f0f0f0;
-            border: 1px solid rgba(0,0,0,0.05);
+            display: none; /* Nascondi di default */
         }
 
+        /* TIMER & AZIONI */
         #timer-ui { display: none; margin-bottom: 20px; background: rgba(0,0,0,0.7); padding: 12px 30px; border-radius: 40px; align-items: center; gap: 15px; border: 1px solid var(--cyan); align-self: center; box-shadow: var(--neon); z-index: 1000; }
         #timer-val { font-family: monospace; font-size: 2rem; color: var(--cyan); font-weight: bold; }
-        #timer-btn { background: var(--cyan); border: none; width: 45px; height: 45px; border-radius: 50%; color: black; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        #timer-btn { background: var(--cyan); border: none; width: 45px; height: 45px; border-radius: 50%; color: black; font-weight: bold; font-size: 1.2rem; cursor: pointer; }
 
         .btn-action { 
             width: 100%; padding: 22px; border-radius: 25px; border: 2px solid var(--cyan); 
@@ -86,7 +97,8 @@
             box-shadow: var(--neon); animation: neonPulse 2.5s infinite; margin-bottom: 40px;
         }
         @keyframes neonPulse { 0%, 100% { box-shadow: 0 0 10px var(--cyan); } 50% { box-shadow: 0 0 25px var(--cyan); } }
-        
+
+        /* EDITOR */
         .scroll-area { overflow-y: auto; flex-grow: 1; padding-bottom: 80px; }
         .input-group { background: var(--glass); padding: 25px; border-radius: 35px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); }
         textarea, select, input[type=number], input[type=text] { width: 100%; background: #000; border: 1px solid #333; color: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; font-size: 1rem; }
@@ -107,8 +119,8 @@
         input:checked + .slider { background: var(--alc); }
         input:checked + .slider:before { transform: translateX(18px); }
 
-        @keyframes ui-shake { 0%, 100% { transform: translate(0,0); } 25% { transform: translate(-5px, 5px); } 75% { transform: translate(5px, -5px); } }
         .ui-vibrate { animation: ui-shake 0.2s ease-in-out; }
+        @keyframes ui-shake { 0%, 100% { transform: translate(0,0); } 25% { transform: translate(-5px, 5px); } 75% { transform: translate(5px, -5px); } }
     </style>
 </head>
 <body>
@@ -162,9 +174,9 @@
             <div class="input-group">
                 <h3 style="color:var(--cyan); margin:0 0 15px 0; font-size:0.9rem; letter-spacing:1px;">NUOVA SFIDA</h3>
                 <select id="ed-lvl"><option value="1">Soft</option><option value="2">Hot</option><option value="3">Hard</option></select>
-                <textarea id="ed-txt" placeholder="Usa @A e @B per i nomi..."></textarea>
-                <input type="text" id="ed-img" placeholder="Percorso Immagine (es: pos/pos1.png)">
-                <input type="number" id="ed-time" placeholder="Timer (sec)">
+                <textarea id="ed-txt" placeholder="Testo sfida..."></textarea>
+                <input type="text" id="ed-img" placeholder="Immagine (es: pos/pos1.png)">
+                <input type="number" id="ed-time" placeholder="Timer (secondi)">
                 <label style="color:var(--alc); font-size:0.7rem; display:flex; align-items:center; gap:10px; margin-bottom:15px;">
                     <input type="checkbox" id="ed-alc"> Sfida Alcolica 🍹
                 </label>
@@ -183,7 +195,6 @@
     </div>
 
     <script>
-        // AGGIORNA CON IL TUO NUOVO URL DOPO LA PUBBLICAZIONE
         const CLOUD_URL = "https://script.google.com/macros/s/AKfycbz5tR2NVhlDzc6M-8AMBO5OE6r225X3miVhfF05YZYQB5oM-i9_bx9DlWNzRgcC85p3/exec";
         
         const aCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -200,58 +211,41 @@
                 const cloudData = await res.json();
                 db = { 1: [], 2: [], 3: [] };
                 cloudData.forEach(item => {
-                    const lvl = parseInt(item.livello);
-                    if(db[lvl]) {
-                        db[lvl].push({ 
-                            t: item.testo, 
-                            s: parseInt(item.timer) || 0, 
-                            alc: item.alcolica,
-                            img: item.immagine || "" 
-                        });
-                    }
+                    const l = parseInt(item.livello);
+                    if(db[l]) db[l].push({ t: item.testo, s: parseInt(item.timer)||0, alc: item.alcolica, img: item.immagine||"" });
                 });
                 dot.style.background = "#00ff00"; dot.style.boxShadow = "0 0 10px #00ff00";
                 if(document.getElementById('view-settings').classList.contains('active')) renderList();
-            } catch (e) { 
-                dot.style.background = "#ff0000"; dot.style.boxShadow = "0 0 10px #ff0000";
-            }
+            } catch (e) { dot.style.background = "#ff0000"; }
         }
 
         async function saveToCloud() {
             const txt = document.getElementById('ed-txt').value;
             if(!txt) return;
             const btn = document.getElementById('btn-save');
-            const originalText = btn.innerText;
-            btn.innerText = "Invio...";
-            btn.disabled = true;
-            
+            btn.innerText = "Invio..."; btn.disabled = true;
             const params = new URLSearchParams({
-                action: 'add', 
-                livello: document.getElementById('ed-lvl').value,
-                testo: txt, 
-                timer: document.getElementById('ed-time').value || 0,
+                action: 'add', livello: document.getElementById('ed-lvl').value,
+                testo: txt, timer: document.getElementById('ed-time').value || 0,
                 alcolica: document.getElementById('ed-alc').checked,
                 immagine: document.getElementById('ed-img').value || ""
             });
-
             try {
                 await fetch(`${CLOUD_URL}?${params.toString()}`, { mode: 'no-cors' });
                 setTimeout(async () => {
-                    btn.innerText = "Dato Inviato!";
                     document.getElementById('ed-txt').value = "";
                     document.getElementById('ed-img').value = "";
-                    document.getElementById('ed-time').value = "";
-                    document.getElementById('ed-alc').checked = false;
+                    btn.innerText = "Dato Inviato!";
                     await syncDB();
-                    setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 1500);
+                    setTimeout(() => { btn.innerText = "Invia al Cloud"; btn.disabled = false; }, 1500);
                 }, 1000);
             } catch (e) { btn.innerText = "Errore!"; btn.disabled = false; }
         }
 
         async function deleteFromCloud(testo) {
-            if(!confirm("Eliminare la sfida?")) return;
+            if(!confirm("Eliminare?")) return;
             const params = new URLSearchParams({ action: 'delete', testo: testo });
-            try { await fetch(`${CLOUD_URL}?${params.toString()}`, { mode: 'no-cors' }); setTimeout(syncDB, 1200); } catch (e) { console.error(e); }
+            try { await fetch(`${CLOUD_URL}?${params.toString()}`, { mode: 'no-cors' }); setTimeout(syncDB, 1200); } catch (e) {}
         }
 
         function playSound(f, d, gVal = 0.1) {
@@ -269,12 +263,9 @@
         function setLvl(l) { 
             curLvl = l; 
             document.querySelectorAll('.lvl-tab').forEach((t, i) => t.classList.toggle('active', (i+1 === l)));
-            const names = {1: 'SOFT', 2: 'HOT', 3: 'HARD'};
-            const icons = {1: '🎲', 2: '🔥', 3: '😈'};
+            const names = {1:'SOFT', 2:'HOT', 3:'HARD'}, icons = {1:'🎲', 2:'🔥', 3:'😈'};
             document.getElementById('card-stack').innerHTML = `<div class="main-card"><h1>${icons[l]}</h1><p style="font-weight:900; letter-spacing:2px;">MAZZO ${names[l]}</p></div>`;
-            resetTimerLogic();
-            document.getElementById('timer-ui').style.display = 'none';
-            if(navigator.vibrate) navigator.vibrate(20);
+            resetTimerLogic(); document.getElementById('timer-ui').style.display = 'none';
         }
 
         function generateChallenge() {
@@ -287,7 +278,7 @@
                 if (!isAlc) pool = pool.filter(c => !c.alc);
                 decks[curLvl] = pool.sort(() => Math.random() - 0.5);
             }
-            if (decks[curLvl].length === 0) { alert("Mazzo vuoto! Controlla il cloud."); return; }
+            if (decks[curLvl].length === 0) { alert("Mazzo vuoto!"); return; }
             
             const item = decks[curLvl].pop();
             const pA = players[Math.floor(Math.random()*2)], pB = (pA === players[0] ? players[1] : players[0]);
@@ -298,32 +289,26 @@
             const newCard = document.createElement('div');
             newCard.className = 'main-card ui-vibrate';
             const rot = (Math.random() - 0.5) * 4; 
-            newCard.style.transform = `rotate(${rot}deg) scale(0.95)`;
+            newCard.style.transform = `rotate(${rot}deg)`;
 
-            // COSTRUZIONE CARD CON IMMAGINE
-            let imgPart = "";
+            // Immagine logic
+            let imgHtml = "";
             if (item.img && item.img.length > 3) {
                 let src = item.img.trim();
                 if (!src.startsWith('http')) {
                     const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
                     src = baseUrl + src;
                 }
-                imgPart = `<img src="${src}" class="card-img-content" onerror="this.style.display='none'">`;
+                imgHtml = `<img src="${src}" class="card-img-box" style="display:block;" onerror="this.style.display='none'">`;
             }
 
-            newCard.innerHTML = `<div class="card-text">${txt}</div>${imgPart}`;
+            newCard.innerHTML = `<div class="card-txt-box">${txt}</div>${imgHtml}`;
             
             container.appendChild(newCard);
             if(container.children.length > 10) container.removeChild(container.children[0]);
-            setTimeout(() => { newCard.style.transform = `rotate(${rot}deg) scale(1)`; }, 30);
 
-            if(item.s > 0) { 
-                timeLeft = item.s; 
-                document.getElementById('timer-ui').style.display = 'flex'; 
-                updateTUI(); 
-            } else { 
-                document.getElementById('timer-ui').style.display = 'none'; 
-            }
+            if(item.s > 0) { timeLeft = item.s; document.getElementById('timer-ui').style.display = 'flex'; updateTUI(); }
+            else { document.getElementById('timer-ui').style.display = 'none'; }
         }
 
         function handleTimer() {
@@ -334,24 +319,15 @@
                     timeLeft--; updateTUI();
                     if(timeLeft <= 3 && timeLeft > 0) playSound(800, 0.1, 0.05);
                     if(timeLeft <= 0) { 
-                        resetTimerLogic(); 
-                        playSound(440, 1.2);
-                        document.getElementById('card-stack').lastElementChild.innerHTML = `<div><h2 style="color:var(--accent);">TEMPO SCADUTO! 🔥</h2></div>`;
+                        resetTimerLogic(); playSound(440, 1.2);
+                        document.getElementById('card-stack').lastElementChild.innerHTML = `<h2 style="color:var(--accent);">TEMPO SCADUTO! 🔥</h2>`;
                     }
                 }, 1000);
             }
         }
 
-        function resetTimerLogic() { 
-            clearInterval(timer); timer = null; 
-            const btn = document.getElementById('timer-btn');
-            if(btn) btn.innerHTML = '▶'; 
-        }
-
-        function updateTUI() { 
-            let m = Math.floor(timeLeft / 60), s = timeLeft % 60; 
-            document.getElementById('timer-val').innerText = `${m}:${s < 10 ? '0'+s : s}`; 
-        }
+        function resetTimerLogic() { clearInterval(timer); timer = null; if(document.getElementById('timer-btn')) document.getElementById('timer-btn').innerHTML = '▶'; }
+        function updateTUI() { let m = Math.floor(timeLeft / 60), s = timeLeft % 60; document.getElementById('timer-val').innerText = `${m}:${s < 10 ? '0'+s : s}`; }
 
         function openView(id) {
             playSound(300, 0.05);
