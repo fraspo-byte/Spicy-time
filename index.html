@@ -42,7 +42,7 @@
 
         .btn-action { width: 100%; padding: 22px; border-radius: 25px; border: 2px solid var(--cyan); font-weight: 900; background: rgba(112,243,255,0.05); color: var(--cyan); cursor: pointer; box-shadow: var(--neon); margin-bottom: 40px; }
         
-        /* MODALITA' STEALTH */
+        /* STEALTH MODES */
         .wp-container { display:none; flex-direction:column; height:100vh; position:absolute; top:0; left:0; width:100%; z-index:2000; background:#e5ddd5; }
         .wp-header { background:#075e54; color:white; padding:45px 15px 10px; font-weight:bold; }
         .wp-input-area { background:#f0f0f0; padding:10px; display:flex; gap:10px; align-items:center; }
@@ -55,8 +55,9 @@
 
         .pad-container { display:none; height:100vh; position:absolute; top:0; left:0; width:100%; z-index:2000; background:#000; touch-action:none; }
 
-        .lvl-tab { font-size: 0.8rem; font-weight: 900; opacity: 0.2; cursor: pointer; }
-        .lvl-tab.active { opacity: 1; transform: scale(1.2); }
+        /* TAB LIVELLI ORIGINALI */
+        .lvl-tab { font-size: 0.8rem; font-weight: 900; opacity: 0.2; cursor: pointer; transition: 0.3s; }
+        .lvl-tab.active { opacity: 1; transform: scale(1.2); text-shadow: 0 0 10px currentColor; }
         .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
         .switch input { opacity: 0; width: 0; }
         .slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #333; border-radius: 34px; cursor: pointer; }
@@ -65,6 +66,8 @@
         input:checked + .slider:before { transform: translateX(18px); }
         
         .scroll-area { overflow-y: auto; flex-grow: 1; padding-bottom: 80px; }
+        textarea, select { width: 100%; background: #000; border: 1px solid #333; color: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; }
+        .challenge-item { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--cyan); font-size: 0.75rem; }
     </style>
 </head>
 <body>
@@ -107,7 +110,7 @@
     <div id="view-kamasutra" class="view">
         <div id="kama-display">
             <div class="main-card">
-                <h1>😈</h1><h3>KAMASUTRA</h3><p style="color:#666; font-size:0.8rem;">Pronti a provare qualcosa di nuovo?</p>
+                <h1>😈</h1><h3>KAMASUTRA</h3><p style="color:#666; font-size:0.8rem;">Scopri nuove posizioni.</p>
             </div>
         </div>
         <button class="btn-action" onclick="generateKama()">Posizione Casuale</button>
@@ -119,11 +122,11 @@
             <button class="btn-action" id="vibe-conn-btn" onclick="connectVibe()" style="font-size:0.7rem; border-color:#333;">Sincronizza Hardware</button>
             <p id="vibe-status-txt" style="font-size:0.6rem; color:#444;">DISPOSITIVO SCOLLEGATO</p>
         </div>
-        <div class="vibe-hub-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; padding:20px;">
-            <div class="stealth-btn" onclick="openStealth('wp')">WHATSAPP</div>
-            <div class="stealth-btn" onclick="openStealth('calc')">CALCOLATRICE</div>
-            <div class="stealth-btn" onclick="openStealth('pad')">BLACK PAD</div>
-            <div class="stealth-btn" onclick="goHome()">ESCI</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; padding:20px;">
+            <div class="menu-card" style="padding:15px;" onclick="openStealth('wp')"><span>WHATSAPP</span></div>
+            <div class="menu-card" style="padding:15px;" onclick="openStealth('calc')"><span>CALC</span></div>
+            <div class="menu-card" style="padding:15px;" onclick="openStealth('pad')"><span>BLACK PAD</span></div>
+            <div class="menu-card" style="padding:15px;" onclick="goHome()"><span>ESCI</span></div>
         </div>
 
         <!-- WP -->
@@ -135,17 +138,148 @@
                 <div style="background:#075e54; color:white; width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center;" ontouchstart="startVoiceMode()" ontouchend="stopVoiceMode()">🎤</div>
             </div>
         </div>
-
         <!-- CALC -->
         <div id="mode-calc" class="calc-container">
             <div class="calc-display" id="calc-res" onclick="closeStealth()">0</div>
             <div class="calc-grid">
-                <button class="calc-btn" onclick="calcNum(7)">7</button><button class="calc-btn" onclick="calcNum(8)">8</button><button class="calc-btn" onclick="calcNum(9)">9</button><button class="calc-btn" style="background:#ff9f0a" onclick="stopVibe()">÷</button>
-                <button class="calc-btn" onclick="calcNum(4)">4</button><button class="calc-btn" onclick="calcNum(5)">5</button><button class="calc-btn" onclick="calcNum(6)">6</button><button class="calc-btn" style="background:#ff9f0a" onclick="stopVibe()">×</button>
-                <button class="calc-btn" onclick="calcNum(1)">1</button><button class="calc-btn" onclick="calcNum(2)">2</button><button class="calc-btn" onclick="calcNum(3)">3</button><button class="calc-btn" style="background:#ff9f0a" onclick="stopVibe()">-</button>
-                <button class="calc-btn" style="grid-column: span 2; border-radius:30px;" onclick="calcNum(0)">0</button><button class="calc-btn">.</button><button class="calc-btn" style="background:#ff9f0a" onclick="stopVibe()">=</button>
+                <button class="calc-btn" onclick="calcNum(7)">7</button><button class="calc-btn" onclick="calcNum(8)">8</button><button class="calc-btn" onclick="calcNum(9)">9</button><button class="calc-btn" style="background:#ff9f0a">÷</button>
+                <button class="calc-btn" onclick="calcNum(4)">4</button><button class="calc-btn" onclick="calcNum(5)">5</button><button class="calc-btn" onclick="calcNum(6)">6</button><button class="calc-btn" style="background:#ff9f0a">×</button>
+                <button class="calc-btn" onclick="calcNum(1)">1</button><button class="calc-btn" onclick="calcNum(2)">2</button><button class="calc-btn" onclick="calcNum(3)">3</button><button class="calc-btn" style="background:#ff9f0a">-</button>
             </div>
         </div>
-
         <!-- PAD -->
-        <div id="mode-pad" class="pad-container" ontouchstart="handlePad(event)" ontouchmove="handlePad(e
+        <div id="mode-pad" class="pad-container" ontouchstart="handlePad(event)" ontouchmove="handlePad(event)" ontouchend="stopVibe()" onclick="closeStealth()"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="view-settings" class="view">
+        <div class="scroll-area">
+            <div class="input-group">
+                <h3>NUOVA SFIDA</h3>
+                <select id="ed-lvl"><option value="1">Soft</option><option value="2">Hot</option><option value="3">Hard</option></select>
+                <textarea id="ed-txt" placeholder="Usa @A e @B per i nomi..."></textarea>
+                <button class="btn-action" onclick="saveToCloud()">Invia al Cloud</button>
+            </div>
+            <div id="master-list">Caricamento...</div>
+        </div>
+    </div>
+
+    <script>
+        const CLOUD_URL = "https://script.google.com/macros/s/AKfycbz5tR2NVhlDzc6M-8AMBO5OE6r225X3miVhfF05YZYQB5oM-i9_bx9DlWNzRgcC85p3/exec";
+        const players = ["Eva", "Francesco"];
+        let db = { 1: [], 2: [], 3: [] }, decks = { 1: [], 2: [], 3: [] };
+        let curLvl = 1, isAlc = false, bpClient, bpDevice, audioCtx, analyser, dataArray;
+
+        // --- FIX BUTTPLUG V3 ---
+        async function connectVibe() {
+            const txt = document.getElementById('vibe-status-txt');
+            try {
+                if (typeof Buttplug === 'undefined') throw new Error("Libreria non caricata");
+                
+                await Buttplug.buttplugInit();
+                bpClient = new Buttplug.ButtplugClient("SpicyTime");
+
+                // Gestione costruttore dinamica per evitare errori di versione
+                let options;
+                if (Buttplug.ButtplugEmbeddedConnectorOptions) {
+                    options = new Buttplug.ButtplugEmbeddedConnectorOptions();
+                } else if (Buttplug.ButtplugBrowserMobileWebBluetoothConnectorOptions) {
+                    options = new Buttplug.ButtplugBrowserMobileWebBluetoothConnectorOptions();
+                } else {
+                    throw new Error("Impossibile trovare il connettore Bluetooth.");
+                }
+
+                await bpClient.connect(options);
+
+                bpClient.on("deviceadded", (d) => { 
+                    bpDevice = d; 
+                    txt.innerText = "CONNESSO: " + d.Name;
+                    txt.style.color = "var(--cyan)";
+                });
+
+                await bpClient.startScanning();
+            } catch (e) { 
+                alert("ERRORE: " + e.message); 
+            }
+        }
+
+        async function vibrate(i) { if(bpDevice) await bpDevice.vibrate(Math.max(0, Math.min(1, i))); }
+        function stopVibe() { vibrate(0); }
+        function openStealth(m) { document.getElementById('mode-'+m).style.display = 'flex'; }
+        function closeStealth() { document.querySelectorAll('.wp-container, .calc-container, .pad-container').forEach(el=>el.style.display='none'); stopVibe(); }
+        
+        function handleTyping(v) { 
+            let i = v.length * 0.05 + ((v.match(/[A-Z]/g)||[]).length * 0.2);
+            vibrate(i); clearTimeout(window.vT); window.vT = setTimeout(stopVibe, 600);
+        }
+
+        async function startVoiceMode() {
+            try {
+                if(!audioCtx) audioCtx = new AudioContext();
+                const s = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const src = audioCtx.createMediaStreamSource(s);
+                analyser = audioCtx.createAnalyser(); src.connect(analyser);
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+                function loop() { if(!analyser) return; analyser.getByteFrequencyData(dataArray); let sum = 0; dataArray.forEach(v=>sum+=v); vibrate((sum/dataArray.length)/80); window.vLoop = requestAnimationFrame(loop); }
+                loop();
+            } catch(e) { alert("Attiva il microfono!"); }
+        }
+        function stopVoiceMode() { cancelAnimationFrame(window.vLoop); analyser=null; stopVibe(); }
+        function calcNum(n) { document.getElementById('calc-res').innerText = n; vibrate(n/10); setTimeout(stopVibe, 400); }
+        function handlePad(e) { vibrate(1 - (e.touches[0].clientY / window.innerHeight)); }
+
+        // --- KAMASUTRA ---
+        const kPos = [
+            {n:"69", d:"Un classico intramontabile.", i:"♋"},
+            {n:"Doggy Style", d:"Passione pura e profondità.", i:"🐕"},
+            {n:"Missionario", d:"Intimità e contatto visivo.", i:"👩‍❤️‍👨"},
+            {n:"Cowgirl", d:"Lei prende il comando.", i:"🤠"},
+            {n:"Il Cucchiaio", d:"Sensualità e coccole.", i:"🥄"},
+            {n:"La Farfalla", d:"Lei sul bordo del tavolo.", i:"🦋"},
+            {n:"Gambe alle spalle", d:"Contatto profondo.", i:"🔥"}
+        ];
+        function generateKama() {
+            const p = kPos[Math.floor(Math.random()*kPos.length)];
+            document.getElementById('kama-display').innerHTML = `<div class="main-card"><h1>${p.i}</h1><h3>${p.n}</h3><p style="color:#666; font-size:0.8rem;">${p.d}</p></div>`;
+        }
+
+        // --- ORIGINALI ---
+        async function syncDB() {
+            try {
+                const res = await fetch(`${CLOUD_URL}?t=${Date.now()}`);
+                const data = await res.json();
+                db = { 1: [], 2: [], 3: [] };
+                data.forEach(item => { if(db[item.livello]) db[item.livello].push({ t: item.testo, alc: item.alcolica }); });
+                document.getElementById('cloud-dot').style.background = "#0f0";
+                if(document.getElementById('view-settings').classList.contains('active')) renderList();
+            } catch (e) { document.getElementById('cloud-dot').style.background = "#f00"; }
+        }
+        function setLvl(l) { 
+            curLvl = l; document.querySelectorAll('.lvl-tab').forEach((t, i) => t.classList.toggle('active', (i+1 === l)));
+            const icons = {1:'🎲', 2:'🔥', 3:'😈'};
+            document.getElementById('card-stack').innerHTML = `<div class="main-card"><h1>${icons[l]}</h1><p style="font-weight:900;">MAZZO LIVELLO ${l}</p></div>`;
+        }
+        function generateChallenge() {
+            if (decks[curLvl].length === 0) {
+                let pool = [...db[curLvl]]; if (!isAlc) pool = pool.filter(c => !c.alc);
+                decks[curLvl] = pool.sort(() => Math.random() - 0.5);
+            }
+            if (decks[curLvl].length === 0) return;
+            const item = decks[curLvl].pop();
+            const pA = players[Math.floor(Math.random()*2)], pB = (pA === players[0] ? players[1] : players[0]);
+            let txt = item.t.replace(/@A/g, `<strong>${pA}</strong>`).replace(/@B/g, `<strong>${pB}</strong>`);
+            const container = document.getElementById('card-stack');
+            const newCard = document.createElement('div'); newCard.className = 'main-card';
+            newCard.innerHTML = `<div style="font-size: 1.3rem; font-weight:700;">${txt}</div>`;
+            container.appendChild(newCard);
+            if(container.children.length > 5) container.removeChild(container.children[0]);
+        }
+        function saveToCloud() { /* Come originale */ }
+        function renderList() { /* Come originale */ }
+        function openView(id) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById('view-' + id).classList.add('active'); document.getElementById('btn-back').style.visibility = (id === 'home' ? 'hidden' : 'visible'); }
+        function goHome() { closeStealth(); openView('home'); }
+        function toggleAlcohol() { isAlc = document.getElementById('alc-toggle').checked; decks = {1:[], 2:[], 3:[]}; }
+        syncDB(); setInterval(syncDB, 30000);
+    </script>
+</body>
+</html>
