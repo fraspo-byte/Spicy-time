@@ -4,11 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Spicy Time Premium</title>
-    <!-- LINK PER INSTALLAZIONE PWA -->
     <link rel="manifest" href="manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    
     <script src="https://cdn.jsdelivr.net/npm/buttplug@3.0.0/dist/web/buttplug.min.js"></script>
     <style>
         :root {
@@ -18,63 +14,59 @@
             --soft: #70f3ff; --hot: #ff00ff; --hard: #ff2d55;
             --neon: 0 0 15px rgba(112, 243, 255, 0.5);
         }
-
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { background: #0d0b1a; color: #fff; margin: 0; padding: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: #0d0b1a; color: #fff; margin: 0; padding: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; font-family: -apple-system, sans-serif; }
 
-        .bg-mesh { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; background: #0d0b1a; }
-        .blob { position: absolute; width: 450px; height: 450px; background: var(--purple); filter: blur(100px); border-radius: 50%; opacity: 0.2; animation: move 25s infinite alternate ease-in-out; }
-        .blob.one { top: -100px; left: -100px; }
+        .bg-mesh { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: #0d0b1a; }
+        .blob { position: absolute; width: 450px; height: 450px; background: var(--purple); filter: blur(100px); border-radius: 50%; opacity: 0.2; animation: move 25s infinite alternate; }
         .blob.two { bottom: -100px; right: -100px; background: var(--accent); animation-delay: -5s; }
         @keyframes move { 0% { transform: translate(0, 0); } 100% { transform: translate(120px, 200px); } }
 
         .top-nav { padding: 50px 20px 10px; display: grid; grid-template-columns: 80px 1fr 80px; align-items: center; height: 110px; z-index: 100; }
-        .back-btn { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); color: var(--cyan); padding: 10px; border-radius: 15px; font-size: 0.7rem; visibility: hidden; font-weight: 900; text-transform: uppercase; backdrop-filter: blur(10px); cursor: pointer; }
+        .back-btn { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); color: var(--cyan); padding: 10px; border-radius: 15px; font-size: 0.7rem; visibility: hidden; font-weight: 900; }
         .app-title { font-size: 1.1rem; letter-spacing: 5px; color: #fff; text-transform: uppercase; font-weight: 900; text-align: center; text-shadow: 0 0 10px var(--cyan); }
-        #cloud-dot { width: 10px; height: 10px; border-radius: 50%; background: #444; transition: 0.5s; }
+        #cloud-dot { width: 10px; height: 10px; border-radius: 50%; background: #444; justify-self: center; }
 
         .view { display: none; flex-direction: column; flex-grow: 1; padding: 0 20px; overflow: hidden; }
         .view.active { display: flex; animation: viewIn 0.3s ease-out; }
         @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
-        .menu-card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 35px; padding: 25px 10px; text-align: center; backdrop-filter: blur(15px); cursor: pointer; transition: 0.2s; }
+        .menu-card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 35px; padding: 25px 10px; text-align: center; backdrop-filter: blur(15px); }
         .menu-card img { width: 60px; height: 60px; margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--cyan)); }
-        .menu-card span { display: block; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--cyan); letter-spacing: 1px; }
+        .menu-card span { display: block; font-size: 0.6rem; font-weight: 800; color: var(--cyan); letter-spacing: 1px; }
 
-        /* VIBE HUB */
-        .vibe-hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
-        .stealth-btn { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; padding: 25px 10px; text-align: center; color: var(--cyan); font-size: 0.7rem; font-weight: 900; cursor: pointer; }
-        
-        .wp-container, .calc-container, .pad-container { display:none; flex-direction:column; height:100vh; position:absolute; top:0; left:0; width:100%; z-index:2000; }
-        .wp-container { background:#e5ddd5; }
-        .wp-header { background:#075e54; color:white; padding:45px 15px 10px; display:flex; align-items:center; gap:10px; }
-        .wp-input-area { background:#f0f0f0; padding:10px; display:flex; gap:10px; }
-        .wp-input { background:white; border-radius:25px; padding:10px; flex-grow:1; border:none; color:black; }
-        
-        .calc-container { background:black; padding:20px; }
-        .calc-display { height:150px; color:white; font-size:4rem; display:flex; align-items:flex-end; justify-content:flex-end; }
-        .calc-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; }
-        .calc-btn { aspect-ratio:1; border-radius:50%; border:none; font-size:1.5rem; font-weight:bold; }
-
-        /* GAME & KAMASUTRA CARD */
-        #card-stack, #kama-display { position: relative; flex-grow: 1; margin: 20px 0; display: flex; align-items: center; justify-content: center; perspective: 1000px; }
+        #card-stack, #kama-display { position: relative; flex-grow: 1; margin: 20px 0; display: flex; align-items: center; justify-content: center; }
         .main-card { position: absolute; width: 88%; aspect-ratio: 3/4; max-height: 420px; background: #fff; color: #0d0b1a; border-radius: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 35px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
 
-        .btn-action { width: 100%; padding: 22px; border-radius: 25px; border: 2px solid var(--cyan); font-weight: 900; text-transform: uppercase; background: rgba(112,243,255,0.05); color: var(--cyan); cursor: pointer; box-shadow: var(--neon); margin-bottom: 40px; }
+        .btn-action { width: 100%; padding: 22px; border-radius: 25px; border: 2px solid var(--cyan); font-weight: 900; background: rgba(112,243,255,0.05); color: var(--cyan); cursor: pointer; box-shadow: var(--neon); margin-bottom: 40px; }
+        
+        /* WHATSAPP STEALTH */
+        .wp-container { display:none; flex-direction:column; height:100vh; position:absolute; top:0; left:0; width:100%; z-index:2000; background:#e5ddd5; }
+        .wp-header { background:#075e54; color:white; padding:45px 15px 10px; font-weight:bold; }
+        .wp-input-area { background:#f0f0f0; padding:10px; display:flex; gap:10px; align-items:center; }
+        .wp-input { background:white; border-radius:25px; padding:10px 15px; flex-grow:1; border:none; color:#000; }
+        
+        /* CALC STEALTH */
+        .calc-container { display:none; flex-direction:column; height:100vh; position:absolute; top:0; left:0; width:100%; z-index:2000; background:#000; padding:20px; }
+        .calc-display { height:150px; color:white; font-size:4rem; display:flex; align-items:flex-end; justify-content:flex-end; }
+        .calc-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; }
+        .calc-btn { aspect-ratio:1; border-radius:50%; border:none; font-size:1.5rem; font-weight:bold; background:#333; color:white; }
+
+        /* PAD STEALTH */
+        .pad-container { display:none; height:100vh; position:absolute; top:0; left:0; width:100%; z-index:2000; background:#000; touch-action:none; }
+
         .lvl-tab { font-size: 0.8rem; font-weight: 900; opacity: 0.2; cursor: pointer; }
         .lvl-tab.active { opacity: 1; transform: scale(1.2); }
         .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
         .switch input { opacity: 0; width: 0; }
         .slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #333; border-radius: 34px; cursor: pointer; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background: white; transition: .4s; border-radius: 50%; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .4s; }
         input:checked + .slider { background: var(--alc); }
         input:checked + .slider:before { transform: translateX(18px); }
         
-        /* SCROLL AREAS */
         .scroll-area { overflow-y: auto; flex-grow: 1; padding-bottom: 80px; }
-        .filter-chip { background: var(--glass); padding: 10px 18px; border-radius: 20px; font-size: 0.6rem; font-weight: 800; border: 1px solid transparent; }
-        .filter-chip.active { border-color: var(--cyan); color: var(--cyan); }
+        .challenge-item { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--cyan); font-size: 0.75rem; }
     </style>
 </head>
 <body>
@@ -117,9 +109,9 @@
     <div id="view-kamasutra" class="view">
         <div id="kama-display">
             <div class="main-card">
-                <h1 id="kama-icon">🔥</h1>
-                <h3 id="kama-name">KAMASUTRA</h3>
-                <p id="kama-desc" style="color:#666; font-size:0.8rem;">Scopri una nuova posizione casuale.</p>
+                <h1 id="kama-icon">😈</h1>
+                <h2 id="kama-name">KAMASUTRA</h2>
+                <p id="kama-desc" style="color:#666; font-size:0.8rem;">Pronti a provare qualcosa di nuovo?</p>
             </div>
         </div>
         <button class="btn-action" onclick="generateKama()">Posizione Casuale</button>
@@ -131,31 +123,32 @@
             <button class="btn-action" id="vibe-conn-btn" onclick="connectVibe()" style="font-size:0.7rem; border-color:#333;">Sincronizza Hardware</button>
             <p id="vibe-status-txt" style="font-size:0.6rem; color:#444;">DISPOSITIVO SCOLLEGATO</p>
         </div>
-        <div class="vibe-hub-grid">
+        <div class="vibe-hub-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; padding:20px;">
             <div class="stealth-btn" onclick="openStealth('wp')">WHATSAPP</div>
             <div class="stealth-btn" onclick="openStealth('calc')">CALCOLATRICE</div>
             <div class="stealth-btn" onclick="openStealth('pad')">BLACK PAD</div>
             <div class="stealth-btn" onclick="goHome()">ESCI</div>
         </div>
-        <!-- MODALITA' WHATSAPP -->
+
         <div id="mode-wp" class="wp-container">
-            <div class="wp-header" onclick="closeStealth()"><span>← Amore ❤️</span></div>
+            <div class="wp-header" onclick="closeStealth()">← Amore ❤️</div>
             <div style="flex-grow:1;"></div>
             <div class="wp-input-area">
                 <input type="text" class="wp-input" placeholder="Messaggio" oninput="handleTyping(this.value)">
                 <div style="background:#075e54; color:white; width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center;" ontouchstart="startVoiceMode()" ontouchend="stopVoiceMode()">🎤</div>
             </div>
         </div>
-        <!-- MODALITA' CALC -->
+
         <div id="mode-calc" class="calc-container">
             <div class="calc-display" id="calc-res" onclick="closeStealth()">0</div>
             <div class="calc-grid">
-                <button class="calc-btn" style="background:#a5a5a5" onclick="calcAction('C')">AC</button><button class="calc-btn" style="background:#a5a5a5">+/-</button><button class="calc-btn" style="background:#a5a5a5">%</button><button class="calc-btn" style="background:#ff9f0a">÷</button>
-                <button class="calc-btn" style="background:#333; color:white;" onclick="calcNum(7)">7</button><button class="calc-btn" style="background:#333; color:white;" onclick="calcNum(8)">8</button><button class="calc-btn" style="background:#333; color:white;" onclick="calcNum(9)">9</button><button class="calc-btn" style="background:#ff9f0a">×</button>
-                <button class="calc-btn" style="background:#333; color:white;" onclick="calcNum(4)">4</button><button class="calc-btn" style="background:#333; color:white;" onclick="calcNum(5)">5</button><button class="calc-btn" style="background:#333; color:white;" onclick="calcNum(6)">6</button><button class="calc-btn" style="background:#ff9f0a">-</button>
+                <button class="calc-btn" onclick="calcNum(7)">7</button><button class="calc-btn" onclick="calcNum(8)">8</button><button class="calc-btn" onclick="calcNum(9)">9</button><button class="calc-btn" style="background:#ff9f0a">÷</button>
+                <button class="calc-btn" onclick="calcNum(4)">4</button><button class="calc-btn" onclick="calcNum(5)">5</button><button class="calc-btn" onclick="calcNum(6)">6</button><button class="calc-btn" style="background:#ff9f0a">×</button>
+                <button class="calc-btn" onclick="calcNum(1)">1</button><button class="calc-btn" onclick="calcNum(2)">2</button><button class="calc-btn" onclick="calcNum(3)">3</button><button class="calc-btn" style="background:#ff9f0a">-</button>
+                <button class="calc-btn" style="grid-column: span 2; border-radius:30px;" onclick="calcNum(0)">0</button><button class="calc-btn">.</button><button class="calc-btn" style="background:#ff9f0a">=</button>
             </div>
         </div>
-        <!-- BLACK PAD -->
+
         <div id="mode-pad" class="pad-container" ontouchstart="handlePad(event)" ontouchmove="handlePad(event)" ontouchend="stopVibe()" onclick="closeStealth()"></div>
     </div>
 
@@ -166,9 +159,9 @@
                 <h3>NUOVA SFIDA</h3>
                 <select id="ed-lvl"><option value="1">Soft</option><option value="2">Hot</option><option value="3">Hard</option></select>
                 <textarea id="ed-txt" placeholder="Usa @A e @B per i nomi..."></textarea>
-                <button class="btn-action" id="btn-save" onclick="saveToCloud()">Invia al Cloud</button>
+                <button class="btn-action" onclick="saveToCloud()">Invia al Cloud</button>
             </div>
-            <div id="master-list">Caricamento...</div>
+            <div id="master-list"></div>
         </div>
     </div>
 
@@ -176,75 +169,83 @@
         const CLOUD_URL = "https://script.google.com/macros/s/AKfycbz5tR2NVhlDzc6M-8AMBO5OE6r225X3miVhfF05YZYQB5oM-i9_bx9DlWNzRgcC85p3/exec";
         const players = ["Eva", "Francesco"];
         let db = { 1: [], 2: [], 3: [] }, decks = { 1: [], 2: [], 3: [] };
-        let curLvl = 1, isAlc = false;
-        let bpClient, bpDevice, audioCtx, analyser, dataArray;
+        let curLvl = 1, isAlc = false, bpClient, bpDevice, audioCtx, analyser, dataArray;
 
-        // REGISTRA SERVICE WORKER PER INSTALLAZIONE
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
 
-        // VIBE ENGINE
+        // VIBE LOGIC CON DIAGNOSTICA
         async function connectVibe() {
+            const txt = document.getElementById('vibe-status-txt');
             try {
+                if (!navigator.bluetooth) throw new Error("Bluetooth non supportato da questo browser.");
                 bpClient = new Buttplug.ButtplugClient("SpicyTime");
                 await bpClient.connect(new Buttplug.ButtplugEmbeddedConnectorOptions());
                 bpClient.on("deviceadded", (d) => { 
                     bpDevice = d; 
-                    document.getElementById('vibe-status-txt').innerText = "CONNESSO: " + d.Name;
-                    document.getElementById('vibe-conn-btn').innerText = "PRONTO";
+                    txt.innerText = "CONNESSO: " + d.Name;
+                    txt.style.color = "var(--cyan)";
                 });
                 await bpClient.startScanning();
-            } catch (e) { alert("Usa Chrome su HTTPS o l'app installata."); }
+            } catch (e) { 
+                alert("ERRORE BLUETOOTH: " + e.message + "\n\nAssicurati che:\n1. Il GPS sia ATTIVO.\n2. Hai dato i permessi Bluetooth a Chrome."); 
+            }
         }
+
         async function vibrate(i) { if(bpDevice) await bpDevice.vibrate(Math.max(0, Math.min(1, i))); }
         function stopVibe() { vibrate(0); }
         function openStealth(m) { document.getElementById('mode-'+m).style.display = 'flex'; }
         function closeStealth() { document.querySelectorAll('.wp-container, .calc-container, .pad-container').forEach(el=>el.style.display='none'); stopVibe(); }
-        function handleTyping(v) { vibrate(v.length * 0.05 + ((v.match(/[A-Z]/g)||[]).length * 0.15)); clearTimeout(window.vT); window.vT = setTimeout(stopVibe, 800); }
+        
+        function handleTyping(v) { 
+            let i = v.length * 0.05 + ((v.match(/[A-Z]/g)||[]).length * 0.2);
+            vibrate(i); clearTimeout(window.vT); window.vT = setTimeout(stopVibe, 600);
+        }
+
         async function startVoiceMode() {
-            if(!audioCtx) audioCtx = new AudioContext();
-            const s = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const src = audioCtx.createMediaStreamSource(s);
-            analyser = audioCtx.createAnalyser(); src.connect(analyser);
-            dataArray = new Uint8Array(analyser.frequencyBinCount);
-            function loop() { if(!analyser) return; analyser.getByteFrequencyData(dataArray); let sum = 0; dataArray.forEach(v=>sum+=v); vibrate((sum/dataArray.length)/100); window.vLoop = requestAnimationFrame(loop); }
-            loop();
+            try {
+                if(!audioCtx) audioCtx = new AudioContext();
+                const s = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const src = audioCtx.createMediaStreamSource(s);
+                analyser = audioCtx.createAnalyser(); src.connect(analyser);
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+                function loop() { if(!analyser) return; analyser.getByteFrequencyData(dataArray); let sum = 0; dataArray.forEach(v=>sum+=v); vibrate((sum/dataArray.length)/80); window.vLoop = requestAnimationFrame(loop); }
+                loop();
+            } catch(e) { alert("Attiva il microfono per usare questa funzione."); }
         }
         function stopVoiceMode() { cancelAnimationFrame(window.vLoop); analyser=null; stopVibe(); }
-        function calcNum(n) { document.getElementById('calc-res').innerText = n; vibrate(n/10); setTimeout(stopVibe, 500); }
-        function calcAction(a) { if(a==='C') document.getElementById('calc-res').innerText='0'; stopVibe(); }
+
+        function calcNum(n) { document.getElementById('calc-res').innerText = n; vibrate(n/10); setTimeout(stopVibe, 400); }
         function handlePad(e) { vibrate(1 - (e.touches[0].clientY / window.innerHeight)); }
 
-        // KAMASUTRA
-        const kPositions = [
-            {n: "Missionario", d: "Classica e intima.", i: "👩‍❤️‍👨"},
-            {n: "Doggy Style", d: "Passionale e profonda.", i: "🐕"},
-            {n: "Cowgirl", d: "Lei ha il controllo totale.", i: "🤠"},
-            {n: "Il Cucchiaio", d: "Perfetta per le coccole.", i: "🥄"},
-            {n: "L'Altalena", d: "Acrobatica e intensa.", i: "🎡"}
+        // KAMASUTRA DB
+        const kPos = [
+            {n:"69", d:"Un classico intramontabile per il piacere reciproco.", i:"♋"},
+            {n:"Doggy Style", d:"Passione pura e profondità massima.", i:"🐕"},
+            {n:"Missionario", d:"Intimità e contatto visivo totale.", i:"👩‍❤️‍👨"},
+            {n:"Cowgirl", d:"Lei prende il comando del ritmo.", i:"🤠"},
+            {n:"Il Cucchiaio", d:"Semplice, dolce e molto sensuale.", i:"🥄"},
+            {n:"L'Inceneritore", d:"Gambe sulle spalle per un'intensità incredibile.", i:"🔥"},
+            {n:"La Sedia", d:"Lui seduto, lei sopra di lui rivolta verso di lui.", i:"🪑"}
         ];
         function generateKama() {
-            const pos = kPositions[Math.floor(Math.random()*kPositions.length)];
-            const display = document.getElementById('kama-display');
-            display.innerHTML = `<div class="main-card"><h1>${pos.i}</h1><h3>${pos.n}</h3><p style="color:#666; font-size:0.8rem;">${pos.d}</p></div>`;
+            const p = kPos[Math.floor(Math.random()*kPos.length)];
+            document.getElementById('kama-display').innerHTML = `<div class="main-card"><h1>${p.i}</h1><h3>${p.n}</h3><p style="color:#666; font-size:0.8rem;">${p.d}</p></div>`;
         }
 
-        // GAME CORE (RIPRISTINATO)
+        // FUNZIONI ORIGINALI
         async function syncDB() {
             try {
                 const res = await fetch(`${CLOUD_URL}?t=${Date.now()}`);
                 const data = await res.json();
                 db = { 1: [], 2: [], 3: [] };
                 data.forEach(item => { if(db[item.livello]) db[item.livello].push({ t: item.testo, alc: item.alcolica }); });
-                document.getElementById('cloud-dot').style.background = "#00ff00";
-                if(document.getElementById('view-settings').classList.contains('active')) renderList();
+                document.getElementById('cloud-dot').style.background = "#0f0";
             } catch (e) { document.getElementById('cloud-dot').style.background = "#f00"; }
         }
         function setLvl(l) { 
             curLvl = l; document.querySelectorAll('.lvl-tab').forEach((t, i) => t.classList.toggle('active', (i+1 === l)));
-            const names = {1:'SOFT', 2:'HOT', 3:'HARD'}, icons = {1:'🎲', 2:'🔥', 3:'😈'};
-            document.getElementById('card-stack').innerHTML = `<div class="main-card"><h1>${icons[l]}</h1><p style="font-weight:900;">MAZZO ${names[l]}</p></div>`;
+            const icons = {1:'🎲', 2:'🔥', 3:'😈'};
+            document.getElementById('card-stack').innerHTML = `<div class="main-card"><h1>${icons[l]}</h1><p style="font-weight:900;">MAZZO LIVELLO ${l}</p></div>`;
         }
         function generateChallenge() {
             if (decks[curLvl].length === 0) {
@@ -264,9 +265,7 @@
         function openView(id) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById('view-' + id).classList.add('active'); document.getElementById('btn-back').style.visibility = (id === 'home' ? 'hidden' : 'visible'); }
         function goHome() { closeStealth(); openView('home'); }
         function toggleAlcohol() { isAlc = document.getElementById('alc-toggle').checked; decks = {1:[], 2:[], 3:[]}; }
-        function renderList() { /* Funzione lista impostazioni come originale */ }
-        syncDB();
-        setInterval(syncDB, 30000);
+        syncDB(); setInterval(syncDB, 30000);
     </script>
 </body>
 </html>
