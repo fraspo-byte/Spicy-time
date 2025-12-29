@@ -134,9 +134,9 @@
                 <div id="gold-mode-ui" style="display:none; align-items:center; gap:8px; font-size:0.6rem; color:var(--gold); font-weight:bold;">👑 MODE <label class="switch"><input type="checkbox" id="gold-toggle" onchange="isGoldEnabled = this.checked"><span class="slider"></span></label></div>
             </div>
             <div style="display:flex; gap:25px;">
-                <span onclick="playClick(); setLvl(1)" id="l1" class="lvl-tab active">SOFT</span>
-                <span onclick="playClick(); setLvl(2)" id="l2" class="lvl-tab">HOT</span>
-                <span onclick="playClick(); setLvl(3)" id="l3" class="lvl-tab">HARD</span>
+                <span onclick="setLvl(1)" id="l1" class="lvl-tab active">SOFT</span>
+                <span onclick="setLvl(2)" id="l2" class="lvl-tab">HOT</span>
+                <span onclick="setLvl(3)" id="l3" class="lvl-tab">HARD</span>
             </div>
         </div>
         <div id="card-stack"><div class="main-card"><h1>🎲</h1><p>PRONTI?</p></div></div>
@@ -154,7 +154,7 @@
     <div id="view-edit-cards" class="view">
         <div class="scroll-area">
             <div id="form-cards-add"></div>
-            <!-- BARRA DI RICERCA AGGIUNTA -->
+            <!-- BARRA DI RICERCA -->
             <div class="search-container">
                 <span class="search-icon">🔍</span>
                 <input type="text" class="search-input" placeholder="Cerca nella lista..." oninput="handleSearch(this.value)">
@@ -207,7 +207,8 @@
         let db = { 1: [], 2: [], 3: [], 4: [] }, decks = { 1: [], 2: [], 3: [], 4: [] };
         let hardCount = 0, cardsSinceLastOrgasmo = 6, isGoldEnabled = false;
         let curLvl = 1, isAlc = false, timer = null, timeLeft = 0, currentFilter = 'all', originalText = "";
-        let searchQuery = ""; // Variabile per la ricerca
+        let searchQuery = ""; 
+        let playedCards = []; // MEMORIA SESSIONE
 
         async function syncDB() {
             try {
@@ -223,25 +224,23 @@
             } catch (e) { document.getElementById('cloud-dot').style.background = "#ff0000"; }
         }
 
-        // --- SISTEMA AUDIO (NUOVO) ---
+        // --- AUDIO SYSTEM ---
         function playClick() {
             if (aCtx.state === 'suspended') aCtx.resume();
-            // Suono "Toc" roccioso/premium
             const osc = aCtx.createOscillator();
             const gain = aCtx.createGain();
-            osc.type = 'triangle'; // Onda triangolare per un suono più "pieno" di una sine
-            osc.frequency.setValueAtTime(100, aCtx.currentTime); // Frequenza bassa
+            osc.type = 'triangle'; 
+            osc.frequency.setValueAtTime(100, aCtx.currentTime); 
             gain.gain.setValueAtTime(0.3, aCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, aCtx.currentTime + 0.1); // Decay veloce
+            gain.gain.exponentialRampToValueAtTime(0.001, aCtx.currentTime + 0.1); 
             osc.connect(gain); gain.connect(aCtx.destination);
             osc.start(); osc.stop(aCtx.currentTime + 0.1);
         }
 
         function playGold() {
             if (aCtx.state === 'suspended') aCtx.resume();
-            // Suono "Doppio Campanello" carino
             const now = aCtx.currentTime;
-            [523.25, 659.25].forEach((freq, i) => { // Do5 e Mi5
+            [523.25, 659.25].forEach((freq, i) => { 
                 const osc = aCtx.createOscillator();
                 const gain = aCtx.createGain();
                 osc.type = 'sine';
@@ -254,25 +253,68 @@
             });
         }
 
+        function playAlarm() {
+            if (aCtx.state === 'suspended') aCtx.resume();
+            const now = aCtx.currentTime;
+            // Tono puro "Ding"
+            const osc = aCtx.createOscillator();
+            const gain = aCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1100, now); 
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(0.5, now + 0.01); 
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 2.5); 
+            osc.connect(gain); gain.connect(aCtx.destination);
+            osc.start(now); osc.stop(now + 2.5);
+
+            // Armonica superiore
+            const osc2 = aCtx.createOscillator();
+            const gain2 = aCtx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(2200, now); 
+            gain2.gain.setValueAtTime(0, now);
+            gain2.gain.linearRampToValueAtTime(0.1, now + 0.01);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+            osc2.connect(gain2); gain2.connect(aCtx.destination);
+            osc2.start(now); osc2.stop(now + 1.5);
+        }
+
         // --- GIOCO ---
         function generateChallenge() {
-            playClick(); // Suono pressione pulsante
+            playClick(); 
             if (aCtx.state === 'suspended') aCtx.resume();
             resetTimerLogic(); document.getElementById('timer-ui').style.display = 'none';
             const container = document.getElementById('card-stack');
 
             if (curLvl === 3 && isGoldEnabled && hardCount > 15 && cardsSinceLastOrgasmo > 5 && Math.random() < 0.05) {
-                playGold(); // Suono speciale Orgasmo
+                playGold(); 
                 createCard(container, `<div style="font-size:3rem;">👑</div>Eva, ti sei meritata un <span style="color:var(--accent)">orgasmo</span> ;)`, true);
                 cardsSinceLastOrgasmo = 0; return;
             }
             if(curLvl === 3) { hardCount++; cardsSinceLastOrgasmo++; }
 
-            if (decks[curLvl].length === 0) decks[curLvl] = [...db[curLvl].filter(c => isAlc || !c.alc)].sort(() => Math.random() - 0.5);
+            // LOGICA DECK RINNOVATA (NO DUPLICATI)
+            if (decks[curLvl].length === 0) {
+                // 1. Trova tutte le carte ammissibili (drink mode etc)
+                let candidates = db[curLvl].filter(c => isAlc || !c.alc);
+                // 2. Filtra quelle già giocate
+                let available = candidates.filter(c => !playedCards.includes(c.t));
+                
+                // 3. Se sono finite tutte, resetta la memoria per queste carte e usa tutto
+                if(available.length === 0) {
+                    // Rimuovi dal playedCards le carte di questo livello per poterle rigiocare
+                    playedCards = playedCards.filter(t => !candidates.find(cand => cand.t === t));
+                    available = candidates; 
+                }
+                decks[curLvl] = [...available].sort(() => Math.random() - 0.5);
+            }
+
             const item = decks[curLvl].pop();
             if (!item) return;
 
-            // Randomizzazione Player A e B ogni volta
+            // Aggiungi ai giocati
+            playedCards.push(item.t);
+
             const p = [...players].sort(() => Math.random() - 0.5);
             const textProcessed = item.t.replace(/@A/g, `<strong>${p[0]}</strong>`).replace(/@B/g, `<strong>${p[1]}</strong>`);
 
@@ -302,13 +344,23 @@
             if(timer) { resetTimerLogic(); } else {
                 document.getElementById('timer-btn').innerHTML = '⏸';
                 timer = setInterval(() => {
-                    timeLeft--; updateTUI();
-                    if(timeLeft <= 5 && timeLeft > 0) {
+                    timeLeft--; 
+                    updateTUI();
+                    // Suono solo ultimi 3 secondi
+                    if(timeLeft <= 3 && timeLeft > 0) {
                         const o = aCtx.createOscillator(); o.type='sine'; o.frequency.setValueAtTime(800, aCtx.currentTime);
                         const g = aCtx.createGain(); g.gain.exponentialRampToValueAtTime(0.001, aCtx.currentTime+0.1);
                         o.connect(g); g.connect(aCtx.destination); o.start(); o.stop(aCtx.currentTime+0.1);
                     }
-                    if(timeLeft <= 0) { resetTimerLogic(); }
+                    if(timeLeft <= 0) { 
+                        playAlarm(); // Suono fine
+                        // Cambio testo carta corrente
+                        const curCard = document.querySelector('#card-stack .main-card:last-child .card-txt-box');
+                        if(curCard) curCard.innerHTML = `<h2 style="color:var(--accent); font-size:2rem;">TEMPO SCADUTO!</h2>`;
+                        
+                        resetTimerLogic();
+                        document.getElementById('timer-ui').style.display = 'none'; 
+                    }
                 }, 1000);
             }
         }
@@ -356,13 +408,16 @@
             setTimeout(syncDB, 1000);
         }
 
-        // --- RENDER LISTE (CON FILTRO RICERCA) ---
+        // --- RENDER LISTE ---
         function handleSearch(val) {
             searchQuery = val.toLowerCase();
             renderListSection('list-cards', [1,2,3]);
         }
 
         function renderFormAdd(id, isScenario) {
+            // FIX: Se il form esiste già, non rigenerarlo (evita reset mentre scrivi)
+            if(document.getElementById(`add-txt-${id}`)) return;
+
             const container = document.getElementById(id);
             container.innerHTML = `
                 <div class="input-group">
@@ -397,12 +452,10 @@
             const container = document.getElementById(id); container.innerHTML = "";
             lvls.forEach(l => {
                 db[l].forEach(item => {
-                    // FILTRO ORIGINALE
                     if(id === 'list-cards') {
                         if(currentFilter !== 'all' && currentFilter !== 'alc' && currentFilter != l) return;
                         if(currentFilter === 'alc' && !item.alc) return;
                     }
-                    // NUOVO FILTRO RICERCA
                     if(searchQuery && !item.t.toLowerCase().includes(searchQuery)) return;
 
                     const div = document.createElement('div');
@@ -422,7 +475,23 @@
         function setFilter(f, el) { playClick(); currentFilter = f; document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); renderListSection('list-cards', [1,2,3]); }
         function renderAllLists() { renderListSection('list-cards', [1,2,3]); renderListSection('list-scenarios', [4]); renderFormAdd('form-cards-add', false); renderFormAdd('form-scenarios-add', true); }
         function openView(id) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById('view-' + id).classList.add('active'); document.getElementById('btn-back').style.visibility = (id === 'home' ? 'hidden' : 'visible'); resetTimerLogic(); if(id.includes('edit')) renderAllLists(); }
-        function setLvl(l) { curLvl = l; document.querySelectorAll('.lvl-tab').forEach((t, i) => t.classList.toggle('active', (i+1 === l))); document.getElementById('gold-mode-ui').style.display = (l === 3 ? 'flex' : 'none'); }
+        
+        function setLvl(l) { 
+            playClick();
+            curLvl = l; 
+            document.querySelectorAll('.lvl-tab').forEach((t, i) => t.classList.toggle('active', (i+1 === l))); 
+            document.getElementById('gold-mode-ui').style.display = (l === 3 ? 'flex' : 'none');
+            
+            const container = document.getElementById('card-stack');
+            container.innerHTML = '';
+            const names = {1:'SOFT', 2:'HOT', 3:'HARD'};
+            const color = l==1?'var(--soft)':l==2?'var(--hot)':'var(--hard)';
+            createCard(container, `<h1 style="color:${color}; font-size:2.5rem;">MAZZO ${names[l]}</h1><p>Pronti?</p>`);
+            
+            resetTimerLogic();
+            document.getElementById('timer-ui').style.display = 'none';
+        }
+        
         function toggleAlcohol() { isAlc = document.getElementById('alc-toggle').checked; decks = {1:[], 2:[], 3:[], 4:[]}; }
 
         syncDB();
