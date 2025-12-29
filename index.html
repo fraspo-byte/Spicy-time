@@ -139,7 +139,7 @@
                 <span onclick="setLvl(3)" id="l3" class="lvl-tab">HARD</span>
             </div>
         </div>
-        <div id="card-stack"><div class="main-card"><h1>🎲</h1><p>PRONTI?</p></div></div>
+        <div id="card-stack"><div class="main-card"><h1 style="color:var(--soft); font-size:2.5rem;">MAZZO SOFT</h1><p>PRONTO</p></div></div>
         <div id="timer-ui"><span id="timer-val">00:00</span><button onclick="handleTimer()" id="timer-btn" style="background:var(--cyan); border:none; width:45px; height:45px; border-radius:50%; cursor:pointer;">▶</button></div>
         <button class="btn-action" onclick="generateChallenge()">Prossima Sfida</button>
     </div>
@@ -227,14 +227,23 @@
         // --- AUDIO SYSTEM ---
         function playClick() {
             if (aCtx.state === 'suspended') aCtx.resume();
+            const now = aCtx.currentTime;
             const osc = aCtx.createOscillator();
             const gain = aCtx.createGain();
-            osc.type = 'triangle'; 
-            osc.frequency.setValueAtTime(100, aCtx.currentTime); 
-            gain.gain.setValueAtTime(0.3, aCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, aCtx.currentTime + 0.1); 
-            osc.connect(gain); gain.connect(aCtx.destination);
-            osc.start(); osc.stop(aCtx.currentTime + 0.1);
+            
+            // Simula un sasso/colpo sordo
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(150, now); 
+            osc.frequency.exponentialRampToValueAtTime(40, now + 0.1); // Caduta rapida di tono per "thud"
+            
+            gain.gain.setValueAtTime(0.4, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15); 
+            
+            osc.connect(gain);
+            gain.connect(aCtx.destination);
+            
+            osc.start();
+            osc.stop(now + 0.15);
         }
 
         function playGold() {
@@ -486,7 +495,9 @@
             container.innerHTML = '';
             const names = {1:'SOFT', 2:'HOT', 3:'HARD'};
             const color = l==1?'var(--soft)':l==2?'var(--hot)':'var(--hard)';
-            createCard(container, `<h1 style="color:${color}; font-size:2.5rem;">MAZZO ${names[l]}</h1><p>Pronti?</p>`);
+            
+            // Layout unificato per il cambio mazzo
+            createCard(container, `<h1 style="color:${color}; font-size:2.5rem;">MAZZO ${names[l]}</h1><p>PRONTO</p>`);
             
             resetTimerLogic();
             document.getElementById('timer-ui').style.display = 'none';
