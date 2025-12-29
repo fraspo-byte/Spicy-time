@@ -58,6 +58,11 @@
         .filter-chip { background: var(--glass); padding: 8px 15px; border-radius: 15px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; border: 1px solid transparent; }
         .filter-chip.active { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
 
+        /* SEARCH BAR STYLE */
+        .search-container { position: relative; margin-bottom: 15px; }
+        .search-input { width: 100%; background: var(--glass); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px 15px 12px 40px; border-radius: 20px; font-size: 0.9rem; }
+        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); opacity: 0.5; }
+
         .challenge-item { 
             background: #ffffff; color: #0d0b1a; padding: 20px; border-radius: 25px; 
             margin-bottom: 15px; display: flex; flex-direction: column; gap: 15px; 
@@ -106,7 +111,7 @@
     <div class="bg-mesh"><div class="blob one"></div></div>
 
     <div class="top-nav">
-        <button id="btn-back" class="back-btn" onclick="openView('home')">BACK</button>
+        <button id="btn-back" class="back-btn" onclick="playClick(); openView('home')">BACK</button>
         <div class="app-title">Spicy Time</div>
         <div id="cloud-dot"></div>
     </div>
@@ -114,10 +119,10 @@
     <!-- HOME -->
     <div id="view-home" class="view active">
         <div class="menu-grid">
-            <div class="menu-card" onclick="openView('game')"><img src="img/dice.png"><span>Gioca Carte</span></div>
-            <div class="menu-card" onclick="openView('scenario')"><img src="img/xxx.png"><span>Scenari Hot</span></div>
-            <div class="menu-card" onclick="openView('edit-cards')"><img src="img/bunny.png"><span>Gestione Carte</span></div>
-            <div class="menu-card" onclick="openView('edit-scenarios')"><img src="img/vibe.png"><span>Gestione Scenari</span></div>
+            <div class="menu-card" onclick="playClick(); openView('game')"><img src="img/dice.png"><span>Gioca Carte</span></div>
+            <div class="menu-card" onclick="playClick(); openView('scenario')"><img src="img/xxx.png"><span>Scenari Hot</span></div>
+            <div class="menu-card" onclick="playClick(); openView('edit-cards')"><img src="img/bunny.png"><span>Gestione Carte</span></div>
+            <div class="menu-card" onclick="playClick(); openView('edit-scenarios')"><img src="img/vibe.png"><span>Gestione Scenari</span></div>
         </div>
     </div>
 
@@ -129,9 +134,9 @@
                 <div id="gold-mode-ui" style="display:none; align-items:center; gap:8px; font-size:0.6rem; color:var(--gold); font-weight:bold;">👑 MODE <label class="switch"><input type="checkbox" id="gold-toggle" onchange="isGoldEnabled = this.checked"><span class="slider"></span></label></div>
             </div>
             <div style="display:flex; gap:25px;">
-                <span onclick="setLvl(1)" id="l1" class="lvl-tab active">SOFT</span>
-                <span onclick="setLvl(2)" id="l2" class="lvl-tab">HOT</span>
-                <span onclick="setLvl(3)" id="l3" class="lvl-tab">HARD</span>
+                <span onclick="playClick(); setLvl(1)" id="l1" class="lvl-tab active">SOFT</span>
+                <span onclick="playClick(); setLvl(2)" id="l2" class="lvl-tab">HOT</span>
+                <span onclick="playClick(); setLvl(3)" id="l3" class="lvl-tab">HARD</span>
             </div>
         </div>
         <div id="card-stack"><div class="main-card"><h1>🎲</h1><p>PRONTI?</p></div></div>
@@ -149,6 +154,11 @@
     <div id="view-edit-cards" class="view">
         <div class="scroll-area">
             <div id="form-cards-add"></div>
+            <!-- BARRA DI RICERCA AGGIUNTA -->
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="Cerca nella lista..." oninput="handleSearch(this.value)">
+            </div>
             <div class="filter-bar">
                 <span class="filter-chip active" onclick="setFilter('all', this)">Tutte</span>
                 <span class="filter-chip" onclick="setFilter(1, this)">Soft</span>
@@ -197,6 +207,7 @@
         let db = { 1: [], 2: [], 3: [], 4: [] }, decks = { 1: [], 2: [], 3: [], 4: [] };
         let hardCount = 0, cardsSinceLastOrgasmo = 6, isGoldEnabled = false;
         let curLvl = 1, isAlc = false, timer = null, timeLeft = 0, currentFilter = 'all', originalText = "";
+        let searchQuery = ""; // Variabile per la ricerca
 
         async function syncDB() {
             try {
@@ -212,13 +223,46 @@
             } catch (e) { document.getElementById('cloud-dot').style.background = "#ff0000"; }
         }
 
+        // --- SISTEMA AUDIO (NUOVO) ---
+        function playClick() {
+            if (aCtx.state === 'suspended') aCtx.resume();
+            // Suono "Toc" roccioso/premium
+            const osc = aCtx.createOscillator();
+            const gain = aCtx.createGain();
+            osc.type = 'triangle'; // Onda triangolare per un suono più "pieno" di una sine
+            osc.frequency.setValueAtTime(100, aCtx.currentTime); // Frequenza bassa
+            gain.gain.setValueAtTime(0.3, aCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, aCtx.currentTime + 0.1); // Decay veloce
+            osc.connect(gain); gain.connect(aCtx.destination);
+            osc.start(); osc.stop(aCtx.currentTime + 0.1);
+        }
+
+        function playGold() {
+            if (aCtx.state === 'suspended') aCtx.resume();
+            // Suono "Doppio Campanello" carino
+            const now = aCtx.currentTime;
+            [523.25, 659.25].forEach((freq, i) => { // Do5 e Mi5
+                const osc = aCtx.createOscillator();
+                const gain = aCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now + i * 0.15);
+                gain.gain.setValueAtTime(0.1, now + i * 0.15);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.15 + 1.5);
+                osc.connect(gain); gain.connect(aCtx.destination);
+                osc.start(now + i * 0.15);
+                osc.stop(now + i * 0.15 + 1.5);
+            });
+        }
+
         // --- GIOCO ---
         function generateChallenge() {
+            playClick(); // Suono pressione pulsante
             if (aCtx.state === 'suspended') aCtx.resume();
             resetTimerLogic(); document.getElementById('timer-ui').style.display = 'none';
             const container = document.getElementById('card-stack');
 
             if (curLvl === 3 && isGoldEnabled && hardCount > 15 && cardsSinceLastOrgasmo > 5 && Math.random() < 0.05) {
+                playGold(); // Suono speciale Orgasmo
                 createCard(container, `<div style="font-size:3rem;">👑</div>Eva, ti sei meritata un <span style="color:var(--accent)">orgasmo</span> ;)`, true);
                 cardsSinceLastOrgasmo = 0; return;
             }
@@ -228,11 +272,16 @@
             const item = decks[curLvl].pop();
             if (!item) return;
 
-            createCard(container, (item.alc?'🍹 ':'') + item.t.replace(/@A/g, `<strong>${players[0]}</strong>`).replace(/@B/g, `<strong>${players[1]}</strong>`));
+            // Randomizzazione Player A e B ogni volta
+            const p = [...players].sort(() => Math.random() - 0.5);
+            const textProcessed = item.t.replace(/@A/g, `<strong>${p[0]}</strong>`).replace(/@B/g, `<strong>${p[1]}</strong>`);
+
+            createCard(container, (item.alc?'🍹 ':'') + textProcessed);
             if(item.s > 0) { timeLeft = item.s; document.getElementById('timer-ui').style.display = 'flex'; updateTUI(); }
         }
 
         function generateScenario() {
+            playClick();
             if (decks[4].length === 0) decks[4] = [...db[4]].sort(() => Math.random() - 0.5);
             const item = decks[4].pop();
             if (!item) return;
@@ -274,7 +323,6 @@
             document.getElementById('modal-time').value = time;
             document.getElementById('modal-alc').checked = alc;
             
-            // Nascondi timer/alc se è uno scenario
             document.getElementById('modal-lvl').style.display = (lvl == 4) ? 'none' : 'block';
             document.getElementById('modal-time').style.display = (lvl == 4) ? 'none' : 'block';
             document.getElementById('modal-alc-label').style.display = (lvl == 4) ? 'none' : 'flex';
@@ -286,15 +334,14 @@
         function closeModal() { document.getElementById('edit-modal').style.display = 'none'; }
 
         async function saveModalEdit() {
+            playClick();
             const newTxt = document.getElementById('modal-txt').value;
             if(!newTxt) return;
             const btn = document.querySelector('#edit-modal .btn-action');
             btn.innerText = "Sincronizzazione...";
             
-            // Elimina vecchia
             await fetch(`${CLOUD_URL}?${new URLSearchParams({action:'delete', testo: originalText})}`, {mode:'no-cors'});
             
-            // Aggiungi nuova
             const params = {
                 action: 'add',
                 livello: document.getElementById('modal-lvl').value,
@@ -309,7 +356,12 @@
             setTimeout(syncDB, 1000);
         }
 
-        // --- RENDER LISTE ---
+        // --- RENDER LISTE (CON FILTRO RICERCA) ---
+        function handleSearch(val) {
+            searchQuery = val.toLowerCase();
+            renderListSection('list-cards', [1,2,3]);
+        }
+
         function renderFormAdd(id, isScenario) {
             const container = document.getElementById(id);
             container.innerHTML = `
@@ -326,6 +378,7 @@
         }
 
         async function submitNew(id, forceLvl) {
+            playClick();
             const txt = document.getElementById(`add-txt-${id}`).value;
             if(!txt) return;
             const params = {
@@ -344,10 +397,14 @@
             const container = document.getElementById(id); container.innerHTML = "";
             lvls.forEach(l => {
                 db[l].forEach(item => {
+                    // FILTRO ORIGINALE
                     if(id === 'list-cards') {
                         if(currentFilter !== 'all' && currentFilter !== 'alc' && currentFilter != l) return;
                         if(currentFilter === 'alc' && !item.alc) return;
                     }
+                    // NUOVO FILTRO RICERCA
+                    if(searchQuery && !item.t.toLowerCase().includes(searchQuery)) return;
+
                     const div = document.createElement('div');
                     div.className = "challenge-item";
                     div.style.borderLeftColor = l==1?'var(--soft)':l==2?'var(--hot)':l==3?'var(--hard)':'var(--purple)';
@@ -362,7 +419,7 @@
         }
 
         async function deleteItem(txt) { if(confirm("Eliminare?")) { await fetch(`${CLOUD_URL}?${new URLSearchParams({action:'delete', testo: txt})}`, {mode:'no-cors'}); setTimeout(syncDB, 1000); } }
-        function setFilter(f, el) { currentFilter = f; document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); renderListSection('list-cards', [1,2,3]); }
+        function setFilter(f, el) { playClick(); currentFilter = f; document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); renderListSection('list-cards', [1,2,3]); }
         function renderAllLists() { renderListSection('list-cards', [1,2,3]); renderListSection('list-scenarios', [4]); renderFormAdd('form-cards-add', false); renderFormAdd('form-scenarios-add', true); }
         function openView(id) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById('view-' + id).classList.add('active'); document.getElementById('btn-back').style.visibility = (id === 'home' ? 'hidden' : 'visible'); resetTimerLogic(); if(id.includes('edit')) renderAllLists(); }
         function setLvl(l) { curLvl = l; document.querySelectorAll('.lvl-tab').forEach((t, i) => t.classList.toggle('active', (i+1 === l))); document.getElementById('gold-mode-ui').style.display = (l === 3 ? 'flex' : 'none'); }
